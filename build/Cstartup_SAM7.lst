@@ -1,0 +1,215 @@
+   1              		.cpu arm7tdmi
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 2
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.file	"Cstartup_SAM7.c"
+  13              		.text
+  14              	.Ltext0:
+  15              		.cfi_sections	.debug_frame
+  16              		.align	2
+  17              		.global	AT91F_LowLevelInit
+  19              	AT91F_LowLevelInit:
+  20              	.LFB283:
+  21              		.file 1 "board/Cstartup_SAM7.c"
+   1:board/Cstartup_SAM7.c **** //*----------------------------------------------------------------------------
+   2:board/Cstartup_SAM7.c **** //*         ATMEL Microcontroller Software Support  -  ROUSSET  -
+   3:board/Cstartup_SAM7.c **** //*----------------------------------------------------------------------------
+   4:board/Cstartup_SAM7.c **** //* The software is delivered "AS IS" without warranty or condition of any
+   5:board/Cstartup_SAM7.c **** //* kind, either express, implied or statutory. This includes without
+   6:board/Cstartup_SAM7.c **** //* limitation any warranty or condition with respect to merchantability or
+   7:board/Cstartup_SAM7.c **** //* fitness for any particular purpose, or against the infringements of
+   8:board/Cstartup_SAM7.c **** //* intellectual property rights of others.
+   9:board/Cstartup_SAM7.c **** //*----------------------------------------------------------------------------
+  10:board/Cstartup_SAM7.c **** //* File Name           : Cstartup_SAM7.c
+  11:board/Cstartup_SAM7.c **** //* Object              : Low level initializations written in C for GCC Tools
+  12:board/Cstartup_SAM7.c **** //* Creation            : 12/Jun/04
+  13:board/Cstartup_SAM7.c **** //* 1.2   28/Feb/05 JPP : LIB change AT91C_WDTC_WDDIS & PLL
+  14:board/Cstartup_SAM7.c **** //* 1.3   21/Mar/05 JPP : Change PLL Wait time
+  15:board/Cstartup_SAM7.c **** //*----------------------------------------------------------------------------
+  16:board/Cstartup_SAM7.c **** 
+  17:board/Cstartup_SAM7.c **** // Include the board file description
+  18:board/Cstartup_SAM7.c **** #include "board.h"
+  19:board/Cstartup_SAM7.c **** 
+  20:board/Cstartup_SAM7.c **** // The following functions must be write in ARM mode this function called directly
+  21:board/Cstartup_SAM7.c **** // by exception vector
+  22:board/Cstartup_SAM7.c **** extern void AT91F_Spurious_handler(void);
+  23:board/Cstartup_SAM7.c **** extern void AT91F_Default_IRQ_handler(void);
+  24:board/Cstartup_SAM7.c **** extern void AT91F_Default_FIQ_handler(void);
+  25:board/Cstartup_SAM7.c **** 
+  26:board/Cstartup_SAM7.c **** //*----------------------------------------------------------------------------
+  27:board/Cstartup_SAM7.c **** //* \fn    AT91F_LowLevelInit
+  28:board/Cstartup_SAM7.c **** //* \brief This function performs very low level HW initialization
+  29:board/Cstartup_SAM7.c **** //*        this function can be use a Stack, depending the compilation
+  30:board/Cstartup_SAM7.c **** //*        optimization mode
+  31:board/Cstartup_SAM7.c **** //*----------------------------------------------------------------------------
+  32:board/Cstartup_SAM7.c **** void AT91F_LowLevelInit( void)
+  33:board/Cstartup_SAM7.c **** {
+  22              		.loc 1 33 0
+  23              		.cfi_startproc
+  24              		@ Function supports interworking.
+  25              		@ args = 0, pretend = 0, frame = 0
+  26              		@ frame_needed = 0, uses_anonymous_args = 0
+  27              		@ link register save eliminated.
+  28              	.LVL0:
+  34:board/Cstartup_SAM7.c ****  int            i;
+  35:board/Cstartup_SAM7.c ****  AT91PS_PMC     pPMC = AT91C_BASE_PMC;
+  36:board/Cstartup_SAM7.c ****     //* Set Flash Waite sate
+  37:board/Cstartup_SAM7.c **** 	//  Single Cycle Access at Up to 30 MHz, or 40
+  38:board/Cstartup_SAM7.c **** 	//  if MCK = 47923200 I have 50 Cycle for 1 usecond ( flied MC_FMR->FMCN
+  39:board/Cstartup_SAM7.c **** 	    AT91C_BASE_MC->MC_FMR = ((AT91C_MC_FMCN)&(48 <<16)) | AT91C_MC_FWS_1FWS ;
+  29              		.loc 1 39 0
+  30 0000 C0309FE5 		ldr	r3, .L31
+  31 0004 0020E0E3 		mvn	r2, #0
+  32 0008 9F3002E5 		str	r3, [r2, #-159]
+  40:board/Cstartup_SAM7.c **** 
+  41:board/Cstartup_SAM7.c ****     //* Watchdog Disable
+  42:board/Cstartup_SAM7.c ****         AT91C_BASE_WDTC->WDTC_WDMR= AT91C_WDTC_WDDIS;
+  33              		.loc 1 42 0
+  34 000c 0239A0E3 		mov	r3, #32768
+  35 0010 BB3202E5 		str	r3, [r2, #-699]
+  43:board/Cstartup_SAM7.c **** 
+  44:board/Cstartup_SAM7.c **** 	//* Set MCK at 47 923 200
+  45:board/Cstartup_SAM7.c ****     // 1 Enabling the Main Oscillator:
+  46:board/Cstartup_SAM7.c ****         // SCK = 1/32768 = 30.51 uSecond
+  47:board/Cstartup_SAM7.c ****     	// Start up time = 8 * 6 / SCK = 56 * 30.51 = 1,46484375 ms
+  48:board/Cstartup_SAM7.c ****        pPMC->PMC_MOR = ( (AT91C_CKGR_OSCOUNT) & (0x06 <<8)) | AT91C_CKGR_MOSCEN ;
+  36              		.loc 1 48 0
+  37 0014 B0309FE5 		ldr	r3, .L31+4
+  38 0018 DF3302E5 		str	r3, [r2, #-991]
+  39              	.L2:
+  49:board/Cstartup_SAM7.c ****         // Wait the startup time
+  50:board/Cstartup_SAM7.c ****         while(!(pPMC->PMC_SR & AT91C_PMC_MOSCS));
+  40              		.loc 1 50 0 discriminator 1
+  41 001c 973312E5 		ldr	r3, [r2, #-919]
+  42 0020 010013E3 		tst	r3, #1
+  43 0024 0030E0E3 		mvn	r3, #0
+  44 0028 FBFFFF0A 		beq	.L2
+  51:board/Cstartup_SAM7.c **** 	// 2 Checking the Main Oscillator Frequency (Optional)
+  52:board/Cstartup_SAM7.c **** 	// 3 Setting PLL and divider:
+  53:board/Cstartup_SAM7.c **** 		// - div by 5 Fin = 3,6864 =(18,432 / 5)
+  54:board/Cstartup_SAM7.c **** 		// - Mul 25+1: Fout =	95,8464 =(3,6864 *26)
+  55:board/Cstartup_SAM7.c **** 		// for 96 MHz the erroe is 0.16%
+  56:board/Cstartup_SAM7.c **** 		// Field out NOT USED = 0
+  57:board/Cstartup_SAM7.c **** 		// PLLCOUNT pll startup time estimate at : 0.844 ms
+  58:board/Cstartup_SAM7.c **** 		// PLLCOUNT 28 = 0.000844 /(1/32768)
+  59:board/Cstartup_SAM7.c ****        pPMC->PMC_PLLR = ((AT91C_CKGR_DIV & 0x05) |
+  45              		.loc 1 59 0
+  46 002c 9C209FE5 		ldr	r2, .L31+8
+  47 0030 D32303E5 		str	r2, [r3, #-979]
+  60:board/Cstartup_SAM7.c **** 						//((AT91C_CKGR_DIV_BYPASS & 0x05) |
+  61:board/Cstartup_SAM7.c ****                          (AT91C_CKGR_PLLCOUNT & (28<<8)) |
+  62:board/Cstartup_SAM7.c ****                          (AT91C_CKGR_MUL & (25<<16)));
+  63:board/Cstartup_SAM7.c **** 
+  64:board/Cstartup_SAM7.c ****         // Wait the startup time
+  65:board/Cstartup_SAM7.c ****         while(!(pPMC->PMC_SR & AT91C_PMC_LOCK));
+  48              		.loc 1 65 0
+  49 0034 0320A0E1 		mov	r2, r3
+  50              	.L3:
+  51              		.loc 1 65 0 is_stmt 0 discriminator 1
+  52 0038 973312E5 		ldr	r3, [r2, #-919]
+  53 003c 040013E3 		tst	r3, #4
+  54 0040 FCFFFF0A 		beq	.L3
+  66:board/Cstartup_SAM7.c ****         while(!(pPMC->PMC_SR & AT91C_PMC_MCKRDY));
+  55              		.loc 1 66 0 is_stmt 1
+  56 0044 0020E0E3 		mvn	r2, #0
+  57              	.L18:
+  58 0048 973312E5 		ldr	r3, [r2, #-919]
+  59 004c 080013E3 		tst	r3, #8
+  60 0050 0030E0E3 		mvn	r3, #0
+  61 0054 FBFFFF0A 		beq	.L18
+  67:board/Cstartup_SAM7.c ****  	// 4. Selection of Master Clock and Processor Clock
+  68:board/Cstartup_SAM7.c ****  	// select the PLL clock divided by 2
+  69:board/Cstartup_SAM7.c ****  	    pPMC->PMC_MCKR =  AT91C_PMC_PRES_CLK ;
+  62              		.loc 1 69 0
+  63 0058 0020A0E3 		mov	r2, #0
+  64 005c CF2303E5 		str	r2, [r3, #-975]
+  70:board/Cstartup_SAM7.c ****  	    while(!(pPMC->PMC_SR & AT91C_PMC_MCKRDY));
+  65              		.loc 1 70 0
+  66 0060 0320A0E1 		mov	r2, r3
+  67              	.L5:
+  68              		.loc 1 70 0 is_stmt 0 discriminator 1
+  69 0064 973312E5 		ldr	r3, [r2, #-919]
+  70 0068 080013E3 		tst	r3, #8
+  71 006c 0030E0E3 		mvn	r3, #0
+  72 0070 FBFFFF0A 		beq	.L5
+  71:board/Cstartup_SAM7.c **** 
+  72:board/Cstartup_SAM7.c ****  	    pPMC->PMC_MCKR |= AT91C_PMC_CSS_PLL_CLK  ;
+  73              		.loc 1 72 0 is_stmt 1
+  74 0074 CF2313E5 		ldr	r2, [r3, #-975]
+  75 0078 032082E3 		orr	r2, r2, #3
+  76 007c CF2303E5 		str	r2, [r3, #-975]
+  73:board/Cstartup_SAM7.c ****  	    while(!(pPMC->PMC_SR & AT91C_PMC_MCKRDY));
+  77              		.loc 1 73 0
+  78 0080 0320A0E1 		mov	r2, r3
+  79              	.L6:
+  80              		.loc 1 73 0 is_stmt 0 discriminator 1
+  81 0084 973312E5 		ldr	r3, [r2, #-919]
+  82 0088 080013E3 		tst	r3, #8
+  83 008c FCFFFF0A 		beq	.L6
+  74:board/Cstartup_SAM7.c **** 
+  75:board/Cstartup_SAM7.c **** 	// Set up the default interrupts handler vectors
+  76:board/Cstartup_SAM7.c **** 	AT91C_BASE_AIC->AIC_SVR[0] = (int) AT91F_Default_FIQ_handler ;
+  84              		.loc 1 76 0 is_stmt 1
+  85 0090 3C209FE5 		ldr	r2, .L31+12
+  86 0094 0030E0E3 		mvn	r3, #0
+  87 0098 38109FE5 		ldr	r1, .L31+16
+  88 009c 7F2F03E5 		str	r2, [r3, #-3967]
+  89              	.LVL1:
+  77:board/Cstartup_SAM7.c **** 	for (i=1;i < 31; i++)
+  90              		.loc 1 77 0
+  91 00a0 0130A0E3 		mov	r3, #1
+  92              	.LVL2:
+  93              	.L7:
+  78:board/Cstartup_SAM7.c **** 	{
+  79:board/Cstartup_SAM7.c **** 	    AT91C_BASE_AIC->AIC_SVR[i] = (int) AT91F_Default_IRQ_handler ;
+  94              		.loc 1 79 0 discriminator 2
+  95 00a4 0321A0E1 		mov	r2, r3, asl #2
+  77:board/Cstartup_SAM7.c **** 	for (i=1;i < 31; i++)
+  96              		.loc 1 77 0 discriminator 2
+  97 00a8 013083E2 		add	r3, r3, #1
+  98              	.LVL3:
+  99 00ac 1F0053E3 		cmp	r3, #31
+ 100              		.loc 1 79 0 discriminator 2
+ 101 00b0 801F02E5 		str	r1, [r2, #-3968]
+  77:board/Cstartup_SAM7.c **** 	for (i=1;i < 31; i++)
+ 102              		.loc 1 77 0 discriminator 2
+ 103 00b4 FAFFFF1A 		bne	.L7
+  80:board/Cstartup_SAM7.c **** 	}
+  81:board/Cstartup_SAM7.c **** 	AT91C_BASE_AIC->AIC_SPU  = (int) AT91F_Spurious_handler ;
+ 104              		.loc 1 81 0
+ 105 00b8 1C209FE5 		ldr	r2, .L31+20
+ 106 00bc 0030E0E3 		mvn	r3, #0
+ 107              	.LVL4:
+ 108 00c0 CB2E03E5 		str	r2, [r3, #-3787]
+ 109 00c4 1EFF2FE1 		bx	lr
+ 110              	.L32:
+ 111              		.align	2
+ 112              	.L31:
+ 113 00c8 00013000 		.word	3145984
+ 114 00cc 01060000 		.word	1537
+ 115 00d0 051C1900 		.word	1645573
+ 116 00d4 00000000 		.word	AT91F_Default_FIQ_handler
+ 117 00d8 00000000 		.word	AT91F_Default_IRQ_handler
+ 118 00dc 00000000 		.word	AT91F_Spurious_handler
+ 119              		.cfi_endproc
+ 120              	.LFE283:
+ 122              	.Letext0:
+ 123              		.file 2 "board/AT91SAM7S256.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 Cstartup_SAM7.c
+     /tmp/ccSODUpj.s:16     .text:0000000000000000 $a
+     /tmp/ccSODUpj.s:19     .text:0000000000000000 AT91F_LowLevelInit
+     /tmp/ccSODUpj.s:113    .text:00000000000000c8 $d
+                     .debug_frame:0000000000000010 $d
+
+UNDEFINED SYMBOLS
+AT91F_Default_FIQ_handler
+AT91F_Default_IRQ_handler
+AT91F_Spurious_handler

@@ -1,0 +1,488 @@
+   1              		.cpu arm7tdmi
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 2
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.file	"led.c"
+  13              		.text
+  14              	.Ltext0:
+  15              		.cfi_sections	.debug_frame
+  16              		.align	2
+  17              		.global	LED_Configure
+  19              	LED_Configure:
+  20              	.LFB283:
+  21              		.file 1 "board/led.c"
+   1:board/led.c   **** /* ----------------------------------------------------------------------------
+   2:board/led.c   ****  *         ATMEL Microcontroller Software Support
+   3:board/led.c   ****  * ----------------------------------------------------------------------------
+   4:board/led.c   ****  * Copyright (c) 2008, Atmel Corporation
+   5:board/led.c   ****  *
+   6:board/led.c   ****  * All rights reserved.
+   7:board/led.c   ****  *
+   8:board/led.c   ****  * Redistribution and use in source and binary forms, with or without
+   9:board/led.c   ****  * modification, are permitted provided that the following conditions are met:
+  10:board/led.c   ****  *
+  11:board/led.c   ****  * - Redistributions of source code must retain the above copyright notice,
+  12:board/led.c   ****  * this list of conditions and the disclaimer below.
+  13:board/led.c   ****  *
+  14:board/led.c   ****  * Atmel's name may not be used to endorse or promote products derived from
+  15:board/led.c   ****  * this software without specific prior written permission.
+  16:board/led.c   ****  *
+  17:board/led.c   ****  * DISCLAIMER: THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR
+  18:board/led.c   ****  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+  19:board/led.c   ****  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
+  20:board/led.c   ****  * DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR ANY DIRECT, INDIRECT,
+  21:board/led.c   ****  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  22:board/led.c   ****  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+  23:board/led.c   ****  * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+  24:board/led.c   ****  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+  25:board/led.c   ****  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+  26:board/led.c   ****  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  27:board/led.c   ****  * ----------------------------------------------------------------------------
+  28:board/led.c   ****  */
+  29:board/led.c   **** 
+  30:board/led.c   **** //------------------------------------------------------------------------------
+  31:board/led.c   **** //         Headers
+  32:board/led.c   **** //------------------------------------------------------------------------------
+  33:board/led.c   **** 
+  34:board/led.c   **** #include "led.h"
+  35:board/led.c   **** #include <board.h>
+  36:board/led.c   **** #include <pio/pio.h>
+  37:board/led.c   **** 
+  38:board/led.c   **** //------------------------------------------------------------------------------
+  39:board/led.c   **** //         Local Variables
+  40:board/led.c   **** //------------------------------------------------------------------------------
+  41:board/led.c   **** 
+  42:board/led.c   **** #ifdef PINS_LEDS
+  43:board/led.c   **** static const Pin pinsLeds[] = {PINS_LEDS};
+  44:board/led.c   **** static const unsigned int numLeds = PIO_LISTSIZE(pinsLeds);
+  45:board/led.c   **** #endif
+  46:board/led.c   **** 
+  47:board/led.c   **** //------------------------------------------------------------------------------
+  48:board/led.c   **** //         Global Functions
+  49:board/led.c   **** //------------------------------------------------------------------------------
+  50:board/led.c   **** 
+  51:board/led.c   **** //------------------------------------------------------------------------------
+  52:board/led.c   **** /// Configures the pin associated with the given LED number. If the LED does
+  53:board/led.c   **** /// not exist on the board, the function does nothing.
+  54:board/led.c   **** /// \param led  Number of the LED to configure.
+  55:board/led.c   **** /// \return 1 if the LED exists and has been configured; otherwise 0.
+  56:board/led.c   **** //------------------------------------------------------------------------------
+  57:board/led.c   **** unsigned char LED_Configure(unsigned int led)
+  58:board/led.c   **** {
+  22              		.loc 1 58 0
+  23              		.cfi_startproc
+  24              		@ Function supports interworking.
+  25              		@ args = 0, pretend = 0, frame = 0
+  26              		@ frame_needed = 1, uses_anonymous_args = 0
+  27              	.LVL0:
+  28 0000 0DC0A0E1 		mov	ip, sp
+  29              	.LCFI0:
+  30              		.cfi_def_cfa_register 12
+  59:board/led.c   **** #ifdef PINS_LEDS
+  60:board/led.c   ****     // Check that LED exists
+  61:board/led.c   ****     if (led >= numLeds) {
+  31              		.loc 1 61 0
+  32 0004 030050E3 		cmp	r0, #3
+  58:board/led.c   **** {
+  33              		.loc 1 58 0
+  34 0008 00D82DE9 		stmfd	sp!, {fp, ip, lr, pc}
+  62:board/led.c   **** 
+  63:board/led.c   ****         return 0;
+  35              		.loc 1 63 0
+  36 000c 0000A083 		movhi	r0, #0
+  37              	.LVL1:
+  38              		.cfi_offset 11, -16
+  39              		.cfi_offset 13, -12
+  40              		.cfi_offset 14, -8
+  58:board/led.c   **** {
+  41              		.loc 1 58 0
+  42 0010 04B04CE2 		sub	fp, ip, #4
+  43              	.LCFI1:
+  44              		.cfi_def_cfa 11, 4
+  61:board/led.c   ****     if (led >= numLeds) {
+  45              		.loc 1 61 0
+  46 0014 0400008A 		bhi	.L2
+  64:board/led.c   ****     }
+  65:board/led.c   **** 
+  66:board/led.c   ****     // Configure LED
+  67:board/led.c   ****     return (PIO_Configure(&pinsLeds[led], 1));
+  47              		.loc 1 67 0
+  48 0018 18309FE5 		ldr	r3, .L5
+  49 001c 800080E0 		add	r0, r0, r0, asl #1
+  50 0020 000183E0 		add	r0, r3, r0, asl #2
+  51 0024 0110A0E3 		mov	r1, #1
+  52 0028 FEFFFFEB 		bl	PIO_Configure
+  53              	.LVL2:
+  54              	.L2:
+  68:board/led.c   **** #else
+  69:board/led.c   ****     return 0;
+  70:board/led.c   **** #endif
+  71:board/led.c   **** }
+  55              		.loc 1 71 0
+  56 002c 0CD04BE2 		sub	sp, fp, #12
+  57 0030 00689DE8 		ldmfd	sp, {fp, sp, lr}
+  58 0034 1EFF2FE1 		bx	lr
+  59              	.L6:
+  60              		.align	2
+  61              	.L5:
+  62 0038 00000000 		.word	.LANCHOR0
+  63              		.cfi_endproc
+  64              	.LFE283:
+  66              		.align	2
+  67              		.global	LED_Set
+  69              	LED_Set:
+  70              	.LFB284:
+  72:board/led.c   **** 
+  73:board/led.c   **** //------------------------------------------------------------------------------
+  74:board/led.c   **** /// Turns the given LED on if it exists; otherwise does nothing.
+  75:board/led.c   **** /// \param led  Number of the LED to turn on.
+  76:board/led.c   **** /// \return 1 if the LED has been turned on; 0 otherwise.
+  77:board/led.c   **** //------------------------------------------------------------------------------
+  78:board/led.c   **** unsigned char LED_Set(unsigned int led)
+  79:board/led.c   **** {
+  71              		.loc 1 79 0
+  72              		.cfi_startproc
+  73              		@ Function supports interworking.
+  74              		@ args = 0, pretend = 0, frame = 0
+  75              		@ frame_needed = 1, uses_anonymous_args = 0
+  76              	.LVL3:
+  77 003c 0DC0A0E1 		mov	ip, sp
+  78              	.LCFI2:
+  79              		.cfi_def_cfa_register 12
+  80:board/led.c   **** #ifdef PINS_LEDS
+  81:board/led.c   ****     // Check if LED exists
+  82:board/led.c   ****     if (led >= numLeds) {
+  80              		.loc 1 82 0
+  81 0040 030050E3 		cmp	r0, #3
+  79:board/led.c   **** {
+  82              		.loc 1 79 0
+  83 0044 00D82DE9 		stmfd	sp!, {fp, ip, lr, pc}
+  83:board/led.c   **** 
+  84:board/led.c   ****         return 0;
+  84              		.loc 1 84 0
+  85 0048 0000A083 		movhi	r0, #0
+  86              	.LVL4:
+  87              		.cfi_offset 11, -16
+  88              		.cfi_offset 13, -12
+  89              		.cfi_offset 14, -8
+  79:board/led.c   **** {
+  90              		.loc 1 79 0
+  91 004c 04B04CE2 		sub	fp, ip, #4
+  92              	.LCFI3:
+  93              		.cfi_def_cfa 11, 4
+  82:board/led.c   ****     if (led >= numLeds) {
+  94              		.loc 1 82 0
+  95 0050 0700008A 		bhi	.L8
+  85:board/led.c   ****     }
+  86:board/led.c   **** 
+  87:board/led.c   ****     // Turn LED on
+  88:board/led.c   ****     if (pinsLeds[led].type == PIO_OUTPUT_0) {
+  96              		.loc 1 88 0
+  97 0054 30309FE5 		ldr	r3, .L12
+  98 0058 800080E0 		add	r0, r0, r0, asl #1
+  99 005c 000183E0 		add	r0, r3, r0, asl #2
+ 100 0060 0930D0E5 		ldrb	r3, [r0, #9]	@ zero_extendqisi2
+ 101 0064 030053E3 		cmp	r3, #3
+ 102 0068 0400000A 		beq	.L11
+  89:board/led.c   **** 
+  90:board/led.c   ****         PIO_Set(&pinsLeds[led]);
+  91:board/led.c   ****     }
+  92:board/led.c   ****     else {
+  93:board/led.c   **** 
+  94:board/led.c   ****         PIO_Clear(&pinsLeds[led]);
+ 103              		.loc 1 94 0
+ 104 006c FEFFFFEB 		bl	PIO_Clear
+ 105              	.LVL5:
+  95:board/led.c   ****     }
+  96:board/led.c   **** 
+  97:board/led.c   ****     return 1;
+ 106              		.loc 1 97 0
+ 107 0070 0100A0E3 		mov	r0, #1
+ 108              	.L8:
+  98:board/led.c   **** #else
+  99:board/led.c   ****     return 0;
+ 100:board/led.c   **** #endif
+ 101:board/led.c   **** }
+ 109              		.loc 1 101 0
+ 110 0074 0CD04BE2 		sub	sp, fp, #12
+ 111 0078 00689DE8 		ldmfd	sp, {fp, sp, lr}
+ 112 007c 1EFF2FE1 		bx	lr
+ 113              	.L11:
+  90:board/led.c   ****         PIO_Set(&pinsLeds[led]);
+ 114              		.loc 1 90 0
+ 115 0080 FEFFFFEB 		bl	PIO_Set
+ 116              	.LVL6:
+  97:board/led.c   ****     return 1;
+ 117              		.loc 1 97 0
+ 118 0084 0100A0E3 		mov	r0, #1
+ 119 0088 F9FFFFEA 		b	.L8
+ 120              	.L13:
+ 121              		.align	2
+ 122              	.L12:
+ 123 008c 00000000 		.word	.LANCHOR0
+ 124              		.cfi_endproc
+ 125              	.LFE284:
+ 127              		.align	2
+ 128              		.global	LED_Clear
+ 130              	LED_Clear:
+ 131              	.LFB285:
+ 102:board/led.c   **** 
+ 103:board/led.c   **** //------------------------------------------------------------------------------
+ 104:board/led.c   **** /// Turns a LED off.
+ 105:board/led.c   **** /// \param led  Number of the LED to turn off.
+ 106:board/led.c   **** /// \param 1 if the LED has been turned off; 0 otherwise.
+ 107:board/led.c   **** //------------------------------------------------------------------------------
+ 108:board/led.c   **** unsigned char LED_Clear(unsigned int led)
+ 109:board/led.c   **** {
+ 132              		.loc 1 109 0
+ 133              		.cfi_startproc
+ 134              		@ Function supports interworking.
+ 135              		@ args = 0, pretend = 0, frame = 0
+ 136              		@ frame_needed = 1, uses_anonymous_args = 0
+ 137              	.LVL7:
+ 138 0090 0DC0A0E1 		mov	ip, sp
+ 139              	.LCFI4:
+ 140              		.cfi_def_cfa_register 12
+ 110:board/led.c   **** #ifdef PINS_LEDS
+ 111:board/led.c   ****     // Check if LED exists
+ 112:board/led.c   ****     if (led >= numLeds) {
+ 141              		.loc 1 112 0
+ 142 0094 030050E3 		cmp	r0, #3
+ 109:board/led.c   **** {
+ 143              		.loc 1 109 0
+ 144 0098 00D82DE9 		stmfd	sp!, {fp, ip, lr, pc}
+ 113:board/led.c   **** 
+ 114:board/led.c   ****         return 0;
+ 145              		.loc 1 114 0
+ 146 009c 0000A083 		movhi	r0, #0
+ 147              	.LVL8:
+ 148              		.cfi_offset 11, -16
+ 149              		.cfi_offset 13, -12
+ 150              		.cfi_offset 14, -8
+ 109:board/led.c   **** {
+ 151              		.loc 1 109 0
+ 152 00a0 04B04CE2 		sub	fp, ip, #4
+ 153              	.LCFI5:
+ 154              		.cfi_def_cfa 11, 4
+ 112:board/led.c   ****     if (led >= numLeds) {
+ 155              		.loc 1 112 0
+ 156 00a4 0700008A 		bhi	.L15
+ 115:board/led.c   ****     }
+ 116:board/led.c   **** 
+ 117:board/led.c   ****     // Turn LED off
+ 118:board/led.c   ****     if (pinsLeds[led].type == PIO_OUTPUT_0) {
+ 157              		.loc 1 118 0
+ 158 00a8 30309FE5 		ldr	r3, .L19
+ 159 00ac 800080E0 		add	r0, r0, r0, asl #1
+ 160 00b0 000183E0 		add	r0, r3, r0, asl #2
+ 161 00b4 0930D0E5 		ldrb	r3, [r0, #9]	@ zero_extendqisi2
+ 162 00b8 030053E3 		cmp	r3, #3
+ 163 00bc 0400000A 		beq	.L18
+ 119:board/led.c   **** 
+ 120:board/led.c   ****         PIO_Clear(&pinsLeds[led]);
+ 121:board/led.c   ****     }
+ 122:board/led.c   ****     else {
+ 123:board/led.c   **** 
+ 124:board/led.c   ****         PIO_Set(&pinsLeds[led]);
+ 164              		.loc 1 124 0
+ 165 00c0 FEFFFFEB 		bl	PIO_Set
+ 166              	.LVL9:
+ 125:board/led.c   ****     }
+ 126:board/led.c   **** 
+ 127:board/led.c   ****     return 1;
+ 167              		.loc 1 127 0
+ 168 00c4 0100A0E3 		mov	r0, #1
+ 169              	.L15:
+ 128:board/led.c   **** #else
+ 129:board/led.c   ****     return 0;
+ 130:board/led.c   **** #endif
+ 131:board/led.c   **** }
+ 170              		.loc 1 131 0
+ 171 00c8 0CD04BE2 		sub	sp, fp, #12
+ 172 00cc 00689DE8 		ldmfd	sp, {fp, sp, lr}
+ 173 00d0 1EFF2FE1 		bx	lr
+ 174              	.L18:
+ 120:board/led.c   ****         PIO_Clear(&pinsLeds[led]);
+ 175              		.loc 1 120 0
+ 176 00d4 FEFFFFEB 		bl	PIO_Clear
+ 177              	.LVL10:
+ 127:board/led.c   ****     return 1;
+ 178              		.loc 1 127 0
+ 179 00d8 0100A0E3 		mov	r0, #1
+ 180 00dc F9FFFFEA 		b	.L15
+ 181              	.L20:
+ 182              		.align	2
+ 183              	.L19:
+ 184 00e0 00000000 		.word	.LANCHOR0
+ 185              		.cfi_endproc
+ 186              	.LFE285:
+ 188              		.align	2
+ 189              		.global	LED_Toggle
+ 191              	LED_Toggle:
+ 192              	.LFB286:
+ 132:board/led.c   **** 
+ 133:board/led.c   **** //------------------------------------------------------------------------------
+ 134:board/led.c   **** /// Toggles the current state of a LED.
+ 135:board/led.c   **** /// \param led  Number of the LED to toggle.
+ 136:board/led.c   **** /// \return 1 if the LED has been toggled; otherwise 0.
+ 137:board/led.c   **** //------------------------------------------------------------------------------
+ 138:board/led.c   **** unsigned char LED_Toggle(unsigned int led)
+ 139:board/led.c   **** {
+ 193              		.loc 1 139 0
+ 194              		.cfi_startproc
+ 195              		@ Function supports interworking.
+ 196              		@ args = 0, pretend = 0, frame = 0
+ 197              		@ frame_needed = 1, uses_anonymous_args = 0
+ 198              	.LVL11:
+ 199 00e4 0DC0A0E1 		mov	ip, sp
+ 200              	.LCFI6:
+ 201              		.cfi_def_cfa_register 12
+ 140:board/led.c   **** #ifdef PINS_LEDS
+ 141:board/led.c   ****     // Check if LED exists
+ 142:board/led.c   ****     if (led >= numLeds) {
+ 202              		.loc 1 142 0
+ 203 00e8 030050E3 		cmp	r0, #3
+ 139:board/led.c   **** {
+ 204              		.loc 1 139 0
+ 205 00ec 18D82DE9 		stmfd	sp!, {r3, r4, fp, ip, lr, pc}
+ 143:board/led.c   **** 
+ 144:board/led.c   ****         return 0;
+ 206              		.loc 1 144 0
+ 207 00f0 0000A083 		movhi	r0, #0
+ 208              	.LVL12:
+ 209              		.cfi_offset 3, -24
+ 210              		.cfi_offset 4, -20
+ 211              		.cfi_offset 11, -16
+ 212              		.cfi_offset 13, -12
+ 213              		.cfi_offset 14, -8
+ 139:board/led.c   **** {
+ 214              		.loc 1 139 0
+ 215 00f4 04B04CE2 		sub	fp, ip, #4
+ 216              	.LCFI7:
+ 217              		.cfi_def_cfa 11, 4
+ 142:board/led.c   ****     if (led >= numLeds) {
+ 218              		.loc 1 142 0
+ 219 00f8 0200009A 		bls	.L25
+ 220              	.L22:
+ 145:board/led.c   ****     }
+ 146:board/led.c   **** 
+ 147:board/led.c   ****     // Toggle LED
+ 148:board/led.c   ****     if (PIO_GetOutputDataStatus(&pinsLeds[led])) {
+ 149:board/led.c   **** 
+ 150:board/led.c   ****         PIO_Clear(&pinsLeds[led]);
+ 151:board/led.c   ****     }
+ 152:board/led.c   ****     else {
+ 153:board/led.c   **** 
+ 154:board/led.c   ****         PIO_Set(&pinsLeds[led]);
+ 155:board/led.c   ****     }
+ 156:board/led.c   **** 
+ 157:board/led.c   ****     return 1;
+ 158:board/led.c   **** #else
+ 159:board/led.c   ****     return 0;
+ 160:board/led.c   **** #endif
+ 161:board/led.c   **** }
+ 221              		.loc 1 161 0
+ 222 00fc 14D04BE2 		sub	sp, fp, #20
+ 223 0100 18689DE8 		ldmfd	sp, {r3, r4, fp, sp, lr}
+ 224 0104 1EFF2FE1 		bx	lr
+ 225              	.L25:
+ 148:board/led.c   ****     if (PIO_GetOutputDataStatus(&pinsLeds[led])) {
+ 226              		.loc 1 148 0
+ 227 0108 30309FE5 		ldr	r3, .L27
+ 228 010c 800080E0 		add	r0, r0, r0, asl #1
+ 229 0110 004183E0 		add	r4, r3, r0, asl #2
+ 230 0114 0400A0E1 		mov	r0, r4
+ 231 0118 FEFFFFEB 		bl	PIO_GetOutputDataStatus
+ 232              	.LVL13:
+ 233 011c 000050E3 		cmp	r0, #0
+ 150:board/led.c   ****         PIO_Clear(&pinsLeds[led]);
+ 234              		.loc 1 150 0
+ 235 0120 0400A0E1 		mov	r0, r4
+ 148:board/led.c   ****     if (PIO_GetOutputDataStatus(&pinsLeds[led])) {
+ 236              		.loc 1 148 0
+ 237 0124 0200001A 		bne	.L26
+ 154:board/led.c   ****         PIO_Set(&pinsLeds[led]);
+ 238              		.loc 1 154 0
+ 239 0128 FEFFFFEB 		bl	PIO_Set
+ 240              	.LVL14:
+ 157:board/led.c   ****     return 1;
+ 241              		.loc 1 157 0
+ 242 012c 0100A0E3 		mov	r0, #1
+ 243 0130 F1FFFFEA 		b	.L22
+ 244              	.L26:
+ 150:board/led.c   ****         PIO_Clear(&pinsLeds[led]);
+ 245              		.loc 1 150 0
+ 246 0134 FEFFFFEB 		bl	PIO_Clear
+ 247              	.LVL15:
+ 157:board/led.c   ****     return 1;
+ 248              		.loc 1 157 0
+ 249 0138 0100A0E3 		mov	r0, #1
+ 250 013c EEFFFFEA 		b	.L22
+ 251              	.L28:
+ 252              		.align	2
+ 253              	.L27:
+ 254 0140 00000000 		.word	.LANCHOR0
+ 255              		.cfi_endproc
+ 256              	.LFE286:
+ 258              		.section	.rodata
+ 259              		.align	2
+ 260              		.set	.LANCHOR0,. + 0
+ 263              	pinsLeds:
+ 264 0000 01000000 		.word	1
+ 265 0004 00F4FFFF 		.word	-3072
+ 266 0008 02       		.byte	2
+ 267 0009 04       		.byte	4
+ 268 000a 00       		.byte	0
+ 269 000b 00       		.space	1
+ 270 000c 02000000 		.word	2
+ 271 0010 00F4FFFF 		.word	-3072
+ 272 0014 02       		.byte	2
+ 273 0015 04       		.byte	4
+ 274 0016 00       		.byte	0
+ 275 0017 00       		.space	1
+ 276 0018 04000000 		.word	4
+ 277 001c 00F4FFFF 		.word	-3072
+ 278 0020 02       		.byte	2
+ 279 0021 04       		.byte	4
+ 280 0022 00       		.byte	0
+ 281 0023 00       		.space	1
+ 282 0024 08000000 		.word	8
+ 283 0028 00F4FFFF 		.word	-3072
+ 284 002c 02       		.byte	2
+ 285 002d 04       		.byte	4
+ 286 002e 00       		.byte	0
+ 287 002f 00       		.space	1
+ 288              		.text
+ 289              	.Letext0:
+ 290              		.file 2 "board/AT91SAM7S256.h"
+ 291              		.file 3 "board/peripherals/pio/pio.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 led.c
+     /tmp/ccv0CUhm.s:16     .text:0000000000000000 $a
+     /tmp/ccv0CUhm.s:19     .text:0000000000000000 LED_Configure
+     /tmp/ccv0CUhm.s:62     .text:0000000000000038 $d
+     /tmp/ccv0CUhm.s:66     .text:000000000000003c $a
+     /tmp/ccv0CUhm.s:69     .text:000000000000003c LED_Set
+     /tmp/ccv0CUhm.s:123    .text:000000000000008c $d
+     /tmp/ccv0CUhm.s:127    .text:0000000000000090 $a
+     /tmp/ccv0CUhm.s:130    .text:0000000000000090 LED_Clear
+     /tmp/ccv0CUhm.s:184    .text:00000000000000e0 $d
+     /tmp/ccv0CUhm.s:188    .text:00000000000000e4 $a
+     /tmp/ccv0CUhm.s:191    .text:00000000000000e4 LED_Toggle
+     /tmp/ccv0CUhm.s:254    .text:0000000000000140 $d
+     /tmp/ccv0CUhm.s:259    .rodata:0000000000000000 $d
+     /tmp/ccv0CUhm.s:263    .rodata:0000000000000000 pinsLeds
+                     .debug_frame:0000000000000010 $d
+
+UNDEFINED SYMBOLS
+PIO_Configure
+PIO_Clear
+PIO_Set
+PIO_GetOutputDataStatus

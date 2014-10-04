@@ -1,0 +1,903 @@
+   1              		.cpu arm7tdmi
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 2
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.file	"uart.c"
+  13              		.text
+  14              	.Ltext0:
+  15              		.cfi_sections	.debug_frame
+  16              		.align	2
+  17              		.global	Usart0IrqHandler
+  19              	Usart0IrqHandler:
+  20              	.LFB283:
+  21              		.file 1 "uart.c"
+   1:uart.c        **** #ifndef UART_C
+   2:uart.c        **** #define UART_C
+   3:uart.c        **** 
+   4:uart.c        **** #include "uart.h"
+   5:uart.c        **** AT91S_USART * pUSART = AT91C_BASE_US0;      /* Global Pointer to USART0 */
+   6:uart.c        **** 
+   7:uart.c        **** 
+   8:uart.c        **** // *****************************************************************************
+   9:uart.c        **** // usart0_isr.c
+  10:uart.c        **** 
+  11:uart.c        **** #include "board.h"
+  12:uart.c        **** 
+  13:uart.c        **** #define IRQ_MASK 0x00000080
+  14:uart.c        **** #define FIQ_MASK 0x00000040
+  15:uart.c        **** #define INT_MASK (IRQ_MASK | FIQ_MASK)
+  16:uart.c        **** struct FIFO{
+  17:uart.c        **** 	char bffr[BUFFER_LENGTH]; // holds characters
+  18:uart.c        **** 	int nChars; // counts number of received chars
+  19:uart.c        **** 	char *wr_bffr;// = &bffr[0];  pointer into Buffer
+  20:uart.c        **** 	char *rd_bffr;//= &bffr[0]; // points to position which needs to be read
+  21:uart.c        **** }rx;
+  22:uart.c        **** 
+  23:uart.c        **** 
+  24:uart.c        **** void Usart0IrqHandler (void) {
+  22              		.loc 1 24 0
+  23              		.cfi_startproc
+  24              		@ Function supports interworking.
+  25              		@ args = 0, pretend = 0, frame = 8
+  26              		@ frame_needed = 0, uses_anonymous_args = 0
+  27              		@ link register save eliminated.
+  25:uart.c        **** 
+  26:uart.c        ****         volatile AT91PS_USART pUsart0 = AT91C_BASE_US0; // create a pointer to USART0 structure
+  28              		.loc 1 26 0
+  29 0000 64309FE5 		ldr	r3, .L7
+  24:uart.c        **** void Usart0IrqHandler (void) {
+  30              		.loc 1 24 0
+  31 0004 08D04DE2 		sub	sp, sp, #8
+  32              	.LCFI0:
+  33              		.cfi_def_cfa_offset 8
+  34              		.loc 1 26 0
+  35 0008 04308DE5 		str	r3, [sp, #4]
+  36              	.LVL0:
+  27:uart.c        ****         // determine which interrupt has occurred
+  28:uart.c        ****         // assume half-duplex operation here, only one interrupt type at a time
+  29:uart.c        ****         if ((pUsart0->US_CSR & AT91C_US_RXRDY) == AT91C_US_RXRDY) {
+  37              		.loc 1 29 0
+  38 000c 04309DE5 		ldr	r3, [sp, #4]
+  39 0010 143093E5 		ldr	r3, [r3, #20]
+  40 0014 010013E3 		tst	r3, #1
+  41 0018 0E00000A 		beq	.L1
+  30:uart.c        **** 				if (rx.nChars < BUFFER_LENGTH){
+  42              		.loc 1 30 0
+  43 001c 4C309FE5 		ldr	r3, .L7+4
+  44 0020 342093E5 		ldr	r2, [r3, #52]
+  45 0024 310052E3 		cmp	r2, #49
+  46 0028 0C0000CA 		bgt	.L4
+  31:uart.c        **** 					// we have a receive interrupt,
+  32:uart.c        **** 					// remove it from Receiver Holding Register and place into buffer[]
+  33:uart.c        **** 					*rx.wr_bffr++ = pUsart0->US_RHR;
+  47              		.loc 1 33 0
+  48 002c 04109DE5 		ldr	r1, [sp, #4]
+  49 0030 382093E5 		ldr	r2, [r3, #56]
+  50 0034 181091E5 		ldr	r1, [r1, #24]
+  51 0038 0110C2E4 		strb	r1, [r2], #1
+  34:uart.c        **** 					rx.nChars++;
+  52              		.loc 1 34 0
+  53 003c 341093E5 		ldr	r1, [r3, #52]
+  35:uart.c        **** 					// check if 10 characters have been received
+  36:uart.c        **** 					if(rx.wr_bffr > &rx.bffr[BUFFER_LENGTH]){
+  54              		.loc 1 36 0
+  55 0040 320083E2 		add	r0, r3, #50
+  34:uart.c        **** 					rx.nChars++;
+  56              		.loc 1 34 0
+  57 0044 011081E2 		add	r1, r1, #1
+  58              		.loc 1 36 0
+  59 0048 000052E1 		cmp	r2, r0
+  33:uart.c        **** 					*rx.wr_bffr++ = pUsart0->US_RHR;
+  60              		.loc 1 33 0
+  61 004c 382083E5 		str	r2, [r3, #56]
+  34:uart.c        **** 					rx.nChars++;
+  62              		.loc 1 34 0
+  63 0050 341083E5 		str	r1, [r3, #52]
+  37:uart.c        **** 						rx.wr_bffr = &rx.bffr[0];
+  64              		.loc 1 37 0
+  65 0054 38308385 		strhi	r3, [r3, #56]
+  66              	.L1:
+  38:uart.c        **** 					}
+  39:uart.c        ****                 }
+  40:uart.c        **** 				else{
+  41:uart.c        **** 					//USART_puts("recieve Buffer is Full\n\r");
+  42:uart.c        **** 					//clear interupt anyway!
+  43:uart.c        **** 					pUsart0->US_RHR;
+  44:uart.c        **** 				}
+  45:uart.c        **** 
+  46:uart.c        ****         }
+  47:uart.c        ****        /* else if ((pUsart0->US_CSR & AT91C_US_TXEMPTY) == AT91C_US_TXEMPTY) {
+  48:uart.c        **** 		//USART_puts("transmit interupt\r");
+  49:uart.c        **** // we have a transmit interrupt (previous char has clocked out)
+  50:uart.c        **** // check if 10 characters have been transmitted
+  51:uart.c        ****                 if (nChars >= BUFFER_LENGTH) {
+  52:uart.c        **** // yes, redirect buffer pointer to beginning
+  53:uart.c        ****                         pBuffer = &Buffer[0];
+  54:uart.c        ****                         nChars = 0;
+  55:uart.c        **** // enable receive interrupt, disable the transmit interrupt
+  56:uart.c        ****                         pUsart0->US_IER = AT91C_US_RXRDY; // enable RXRDY usart0 receive interrupt
+  57:uart.c        ****                         pUsart0->US_IDR = ~AT91C_US_RXRDY; // disable all interrupts except RXRDY
+  58:uart.c        ****                 }
+  59:uart.c        ****                 else {
+  60:uart.c        **** // no, send next character
+  61:uart.c        ****                         pUsart0->US_THR = *pBuffer++;
+  62:uart.c        ****                         nChars++;
+  63:uart.c        ****                 }
+  64:uart.c        ****         }*/
+  65:uart.c        **** }
+  67              		.loc 1 65 0
+  68 0058 08D08DE2 		add	sp, sp, #8
+  69 005c 1EFF2FE1 		bx	lr
+  70              	.L4:
+  43:uart.c        **** 					pUsart0->US_RHR;
+  71              		.loc 1 43 0
+  72 0060 04309DE5 		ldr	r3, [sp, #4]
+  73 0064 183093E5 		ldr	r3, [r3, #24]
+  74 0068 FAFFFFEA 		b	.L1
+  75              	.L8:
+  76              		.align	2
+  77              	.L7:
+  78 006c 0000FCFF 		.word	-262144
+  79 0070 00000000 		.word	rx
+  80              		.cfi_endproc
+  81              	.LFE283:
+  83              		.align	2
+  84              		.global	USART0Setup
+  86              	USART0Setup:
+  87              	.LFB284:
+  66:uart.c        **** // *******************************************************
+  67:uart.c        **** // Function Prototypes
+  68:uart.c        **** // *******************************************************
+  69:uart.c        **** //void Usart0IrqHandler(void);
+  70:uart.c        **** void USART0Setup(void) {
+  88              		.loc 1 70 0
+  89              		.cfi_startproc
+  90              		@ Function supports interworking.
+  91              		@ args = 0, pretend = 0, frame = 16
+  92              		@ frame_needed = 0, uses_anonymous_args = 0
+  93              		@ link register save eliminated.
+  71:uart.c        **** // enable the usart0 peripheral clock
+  72:uart.c        **** 	volatile AT91PS_PMC pPMC = AT91C_BASE_PMC; // pointer to PMC data structure
+  94              		.loc 1 72 0
+  95 0074 F4309FE5 		ldr	r3, .L10
+  70:uart.c        **** void USART0Setup(void) {
+  96              		.loc 1 70 0
+  97 0078 10D04DE2 		sub	sp, sp, #16
+  98              	.LCFI1:
+  99              		.cfi_def_cfa_offset 16
+ 100              		.loc 1 72 0
+ 101 007c 00308DE5 		str	r3, [sp, #0]
+ 102              	.LVL1:
+  73:uart.c        **** 	pPMC->PMC_PCER = (1<<AT91C_ID_US0); // enable usart0 peripheral clock
+ 103              		.loc 1 73 0
+ 104 0080 00309DE5 		ldr	r3, [sp, #0]
+ 105 0084 4020A0E3 		mov	r2, #64
+ 106 0088 102083E5 		str	r2, [r3, #16]
+  74:uart.c        **** 	// set up PIO to enable USART0 peripheral control of pins
+  75:uart.c        **** 	volatile AT91PS_PIO pPIO = AT91C_BASE_PIOA; // pointer to PIO data structure
+ 107              		.loc 1 75 0
+ 108 008c E0309FE5 		ldr	r3, .L10+4
+ 109 0090 04308DE5 		str	r3, [sp, #4]
+ 110              	.LVL2:
+  76:uart.c        **** 	pPIO->PIO_PDR = AT91C_PA5_RXD0 | AT91C_PA6_TXD0; // enable peripheral control of PA0,PA1 (RXD0 and
+ 111              		.loc 1 76 0
+ 112 0094 04309DE5 		ldr	r3, [sp, #4]
+ 113 0098 6010A0E3 		mov	r1, #96
+ 114 009c 041083E5 		str	r1, [r3, #4]
+  77:uart.c        **** 	pPIO->PIO_ASR = AT91C_PIO_PA0 | AT91C_PIO_PA1; // assigns the 2 I/O lines to peripheral A function
+ 115              		.loc 1 77 0
+ 116 00a0 04309DE5 		ldr	r3, [sp, #4]
+ 117 00a4 0310A0E3 		mov	r1, #3
+ 118 00a8 701083E5 		str	r1, [r3, #112]
+  78:uart.c        **** 	pPIO->PIO_BSR = 0; // peripheral B function set to "no effect"
+ 119              		.loc 1 78 0
+ 120 00ac 04109DE5 		ldr	r1, [sp, #4]
+ 121 00b0 0030A0E3 		mov	r3, #0
+ 122 00b4 743081E5 		str	r3, [r1, #116]
+  79:uart.c        **** 	// set up the USART0 registers
+  80:uart.c        **** 	volatile AT91PS_USART pUSART0 = AT91C_BASE_US0; // create a pointer to USART0 structure
+ 123              		.loc 1 80 0
+ 124 00b8 B8109FE5 		ldr	r1, .L10+8
+ 125 00bc 08108DE5 		str	r1, [sp, #8]
+ 126              	.LVL3:
+  81:uart.c        **** 	pUSART0->US_CR = AT91C_US_RSTRX | // reset receiver
+ 127              		.loc 1 81 0
+ 128 00c0 08109DE5 		ldr	r1, [sp, #8]
+ 129 00c4 AC00A0E3 		mov	r0, #172
+ 130 00c8 000081E5 		str	r0, [r1, #0]
+  82:uart.c        **** 	AT91C_US_RSTTX | // reset transmitter
+  83:uart.c        **** 	AT91C_US_RXDIS | // disable receiver
+  84:uart.c        **** 	AT91C_US_TXDIS; // disable transmitter
+  85:uart.c        **** 	pUSART0->US_MR = AT91C_US_PAR_NONE | // no parity
+ 131              		.loc 1 85 0
+ 132 00cc 08109DE5 		ldr	r1, [sp, #8]
+ 133 00d0 230DA0E3 		mov	r0, #2240
+ 134 00d4 040081E5 		str	r0, [r1, #4]
+  86:uart.c        **** 	                 0x3 << 6; // 8-bit characters
+  87:uart.c        **** 	//
+  88:uart.c        **** 	pUSART0->US_IER = 0x00; // no usart0 interrupts enabled (no effect)
+ 135              		.loc 1 88 0
+ 136 00d8 08109DE5 		ldr	r1, [sp, #8]
+ 137 00dc 083081E5 		str	r3, [r1, #8]
+  89:uart.c        **** 	//
+  90:uart.c        **** 	pUSART0->US_IDR = 0xFFFF; // disable all USART0 interrupts
+ 138              		.loc 1 90 0
+ 139 00e0 08109DE5 		ldr	r1, [sp, #8]
+ 140 00e4 90009FE5 		ldr	r0, .L10+12
+ 141 00e8 0C0081E5 		str	r0, [r1, #12]
+  91:uart.c        **** 	pUSART0->US_BRGR = 0x139; // CD = 0x139 (313 from above calculation) FP=0 (not used) -->9600 baud
+ 142              		.loc 1 91 0
+ 143 00ec 08109DE5 		ldr	r1, [sp, #8]
+ 144 00f0 88009FE5 		ldr	r0, .L10+16
+ 145 00f4 200081E5 		str	r0, [r1, #32]
+  92:uart.c        **** 	//
+  93:uart.c        **** 	pUSART0->US_RTOR = 0; // receiver time-out (disabled)
+ 146              		.loc 1 93 0
+ 147 00f8 08109DE5 		ldr	r1, [sp, #8]
+ 148 00fc 243081E5 		str	r3, [r1, #36]
+  94:uart.c        **** 	pUSART0->US_TTGR = 0; // transmitter timeguard (disabled)
+ 149              		.loc 1 94 0
+ 150 0100 08109DE5 		ldr	r1, [sp, #8]
+ 151 0104 283081E5 		str	r3, [r1, #40]
+  95:uart.c        **** 	//Set up the Advanced Interrupt Controller (AIC) registers for USART0
+  96:uart.c        **** 	volatile AT91PS_AIC pAIC = AT91C_BASE_AIC; // pointer to AIC data structure
+ 152              		.loc 1 96 0
+ 153 0108 013A43E2 		sub	r3, r3, #4096
+ 154 010c 0C308DE5 		str	r3, [sp, #12]
+ 155              	.LVL4:
+  97:uart.c        **** 	pAIC->AIC_IDCR = (1<<AT91C_ID_US0); // Disable USART0 interrupt in AIC
+ 156              		.loc 1 97 0
+ 157 0110 0C309DE5 		ldr	r3, [sp, #12]
+ 158 0114 242183E5 		str	r2, [r3, #292]
+  98:uart.c        **** 	pAIC->AIC_SVR[AT91C_ID_US0] = // Set the USART0 IRQ handler address in AIC Source
+ 159              		.loc 1 98 0
+ 160 0118 0C309DE5 		ldr	r3, [sp, #12]
+  99:uart.c        **** 	(unsigned int)Usart0IrqHandler; // Vector Register[6]
+ 161              		.loc 1 99 0
+ 162 011c 60109FE5 		ldr	r1, .L10+20
+  98:uart.c        **** 	pAIC->AIC_SVR[AT91C_ID_US0] = // Set the USART0 IRQ handler address in AIC Source
+ 163              		.loc 1 98 0
+ 164 0120 981083E5 		str	r1, [r3, #152]
+ 100:uart.c        **** 	pAIC->AIC_SMR[AT91C_ID_US0] = // Set the interrupt source type(level-sensitive) and
+ 165              		.loc 1 100 0
+ 166 0124 0C309DE5 		ldr	r3, [sp, #12]
+ 167 0128 0410A0E3 		mov	r1, #4
+ 168 012c 181083E5 		str	r1, [r3, #24]
+ 101:uart.c        **** 	(/*AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL*/AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL  | 0x4 ); // priority (4) in
+ 102:uart.c        **** 	pAIC->AIC_IECR = (1<<AT91C_ID_US0); // Enable the USART0 interrupt in AIC
+ 169              		.loc 1 102 0
+ 170 0130 0C309DE5 		ldr	r3, [sp, #12]
+ 171 0134 202183E5 		str	r2, [r3, #288]
+ 103:uart.c        **** 	//enable the USART0 receiver and transmitter
+ 104:uart.c        **** 	pUSART0->US_CR = AT91C_US_RXEN | AT91C_US_TXEN;
+ 172              		.loc 1 104 0
+ 173 0138 08309DE5 		ldr	r3, [sp, #8]
+ 174 013c 5020A0E3 		mov	r2, #80
+ 175 0140 002083E5 		str	r2, [r3, #0]
+ 105:uart.c        **** 	// enable the USART0 receive interrupt
+ 106:uart.c        **** 	pUSART0->US_IER = AT91C_US_RXRDY; // enable RXRDY usart0 receive interrupt
+ 176              		.loc 1 106 0
+ 177 0144 08309DE5 		ldr	r3, [sp, #8]
+ 178 0148 0120A0E3 		mov	r2, #1
+ 179 014c 082083E5 		str	r2, [r3, #8]
+ 107:uart.c        **** 	pUSART0->US_IDR = ~AT91C_US_RXRDY; // disable all interrupts except RXRDY
+ 180              		.loc 1 107 0
+ 181 0150 08309DE5 		ldr	r3, [sp, #8]
+ 182 0154 0120E0E3 		mvn	r2, #1
+ 183 0158 0C2083E5 		str	r2, [r3, #12]
+ 184              	.LBB34:
+ 185              	.LBB35:
+ 186              	.LBB36:
+ 187              	.LBB37:
+ 108:uart.c        **** 	// set up buffer pointer and character counter
+ 109:uart.c        **** 	struct FIFO rx;
+ 110:uart.c        **** 	rx.wr_bffr = (char *)&rx.bffr;
+ 111:uart.c        **** 	rx.rd_bffr = (char *)&rx.bffr;
+ 112:uart.c        **** 	rx.nChars = 0;
+ 113:uart.c        **** 	// enable IRQ interrupts
+ 114:uart.c        **** 	enableIRQ();
+ 115:uart.c        **** 	// at this point, only the USART0 receive interrupt is armed!
+ 116:uart.c        **** }
+ 117:uart.c        **** 
+ 118:uart.c        **** 
+ 119:uart.c        **** void USART_putchar(char c)
+ 120:uart.c        **** {
+ 121:uart.c        **** 	static int first = 1;
+ 122:uart.c        **** 
+ 123:uart.c        **** 	if(!first) while(!(pUSART->US_CSR & AT91C_US_TXRDY));
+ 124:uart.c        **** 	pUSART->US_THR = c;
+ 125:uart.c        **** 	first = 0;
+ 126:uart.c        **** }
+ 127:uart.c        **** 
+ 128:uart.c        **** char USART_getchar()
+ 129:uart.c        **** {
+ 130:uart.c        **** 	if(rx.nChars == 0){
+ 131:uart.c        **** 		return 0;
+ 132:uart.c        **** 	}
+ 133:uart.c        **** 	unsigned char ret_val = *rx.rd_bffr;
+ 134:uart.c        **** 	rx.nChars--;
+ 135:uart.c        **** 	rx.rd_bffr += sizeof(unsigned char);
+ 136:uart.c        **** 	if(rx.rd_bffr > &rx.bffr[BUFFER_LENGTH]){
+ 137:uart.c        **** 		rx.rd_bffr = &rx.bffr[0];
+ 138:uart.c        **** 	}
+ 139:uart.c        **** 	return ret_val;
+ 140:uart.c        **** }
+ 141:uart.c        **** 
+ 142:uart.c        **** int USART_RXavailable()
+ 143:uart.c        **** {
+ 144:uart.c        **** 	return (pUSART->US_CSR & AT91C_US_RXRDY);
+ 145:uart.c        **** }
+ 146:uart.c        **** 
+ 147:uart.c        **** void USART_puts(char *s)
+ 148:uart.c        **** {
+ 149:uart.c        **** 	while(*s != 0x00)
+ 150:uart.c        **** 	{
+ 151:uart.c        **** 		USART_putchar(*s);
+ 152:uart.c        **** 		s++;
+ 153:uart.c        **** 	}
+ 154:uart.c        **** }
+ 155:uart.c        **** 
+ 156:uart.c        **** static inline unsigned __get_cpsr(void)
+ 157:uart.c        **** {
+ 158:uart.c        ****   unsigned long retval;
+ 159:uart.c        ****   asm volatile (" mrs  %0, cpsr" : "=r" (retval) :   );
+ 188              		.loc 1 159 0
+ 189              	@ 159 "uart.c" 1
+ 190 015c 00300FE1 		 mrs  r3, cpsr
+ 191              	@ 0 "" 2
+ 192              	.LVL5:
+ 193              	.LBE37:
+ 194              	.LBE36:
+ 160:uart.c        ****   return retval;
+ 161:uart.c        **** }
+ 162:uart.c        **** 
+ 163:uart.c        **** static inline void __set_cpsr(unsigned val)
+ 164:uart.c        **** {
+ 165:uart.c        ****   asm volatile (" msr  cpsr, %0" :  : "r" (val)  );
+ 166:uart.c        **** }
+ 167:uart.c        **** 
+ 168:uart.c        **** unsigned disableIRQ(void)
+ 169:uart.c        **** {
+ 170:uart.c        ****   unsigned _cpsr;
+ 171:uart.c        **** 
+ 172:uart.c        ****   _cpsr = __get_cpsr();
+ 173:uart.c        ****   __set_cpsr(_cpsr | IRQ_MASK);
+ 174:uart.c        ****   return _cpsr;
+ 175:uart.c        **** }
+ 176:uart.c        **** 
+ 177:uart.c        **** unsigned restoreIRQ(unsigned oldCPSR)
+ 178:uart.c        **** {
+ 179:uart.c        ****   unsigned _cpsr;
+ 180:uart.c        **** 
+ 181:uart.c        ****   _cpsr = __get_cpsr();
+ 182:uart.c        ****   __set_cpsr((_cpsr & ~IRQ_MASK) | (oldCPSR & IRQ_MASK));
+ 183:uart.c        ****   return _cpsr;
+ 184:uart.c        **** }
+ 185:uart.c        **** 
+ 186:uart.c        **** unsigned enableIRQ(void)
+ 187:uart.c        **** {
+ 188:uart.c        ****   unsigned _cpsr;
+ 189:uart.c        **** 
+ 190:uart.c        ****   _cpsr = __get_cpsr();
+ 191:uart.c        ****   __set_cpsr(_cpsr & ~IRQ_MASK);
+ 195              		.loc 1 191 0
+ 196 0160 8030C3E3 		bic	r3, r3, #128
+ 197              	.LVL6:
+ 198              	.LBB38:
+ 199              	.LBB39:
+ 165:uart.c        ****   asm volatile (" msr  cpsr, %0" :  : "r" (val)  );
+ 200              		.loc 1 165 0
+ 201              	@ 165 "uart.c" 1
+ 202 0164 03F029E1 		 msr  cpsr, r3
+ 203              	@ 0 "" 2
+ 204              	.LBE39:
+ 205              	.LBE38:
+ 206              	.LBE35:
+ 207              	.LBE34:
+ 116:uart.c        **** }
+ 208              		.loc 1 116 0
+ 209 0168 10D08DE2 		add	sp, sp, #16
+ 210 016c 1EFF2FE1 		bx	lr
+ 211              	.L11:
+ 212              		.align	2
+ 213              	.L10:
+ 214 0170 00FCFFFF 		.word	-1024
+ 215 0174 00F4FFFF 		.word	-3072
+ 216 0178 0000FCFF 		.word	-262144
+ 217 017c FFFF0000 		.word	65535
+ 218 0180 39010000 		.word	313
+ 219 0184 00000000 		.word	Usart0IrqHandler
+ 220              		.cfi_endproc
+ 221              	.LFE284:
+ 223              		.align	2
+ 224              		.global	USART_putchar
+ 226              	USART_putchar:
+ 227              	.LFB285:
+ 120:uart.c        **** {
+ 228              		.loc 1 120 0
+ 229              		.cfi_startproc
+ 230              		@ Function supports interworking.
+ 231              		@ args = 0, pretend = 0, frame = 0
+ 232              		@ frame_needed = 0, uses_anonymous_args = 0
+ 233              		@ link register save eliminated.
+ 234              	.LVL7:
+ 123:uart.c        **** 	if(!first) while(!(pUSART->US_CSR & AT91C_US_TXRDY));
+ 235              		.loc 1 123 0
+ 236 0188 28109FE5 		ldr	r1, .L20
+ 237 018c 003091E5 		ldr	r3, [r1, #0]
+ 238 0190 000053E3 		cmp	r3, #0
+ 239 0194 042091E5 		ldr	r2, [r1, #4]
+ 240 0198 0200001A 		bne	.L14
+ 241              	.L15:
+ 123:uart.c        **** 	if(!first) while(!(pUSART->US_CSR & AT91C_US_TXRDY));
+ 242              		.loc 1 123 0 is_stmt 0 discriminator 1
+ 243 019c 143092E5 		ldr	r3, [r2, #20]
+ 244 01a0 020013E3 		tst	r3, #2
+ 245 01a4 FCFFFF0A 		beq	.L15
+ 246              	.L14:
+ 125:uart.c        **** 	first = 0;
+ 247              		.loc 1 125 0 is_stmt 1
+ 248 01a8 0030A0E3 		mov	r3, #0
+ 124:uart.c        **** 	pUSART->US_THR = c;
+ 249              		.loc 1 124 0
+ 250 01ac 1C0082E5 		str	r0, [r2, #28]
+ 125:uart.c        **** 	first = 0;
+ 251              		.loc 1 125 0
+ 252 01b0 003081E5 		str	r3, [r1, #0]
+ 253 01b4 1EFF2FE1 		bx	lr
+ 254              	.L21:
+ 255              		.align	2
+ 256              	.L20:
+ 257 01b8 00000000 		.word	.LANCHOR0
+ 258              		.cfi_endproc
+ 259              	.LFE285:
+ 261              		.align	2
+ 262              		.global	USART_getchar
+ 264              	USART_getchar:
+ 265              	.LFB286:
+ 129:uart.c        **** {
+ 266              		.loc 1 129 0
+ 267              		.cfi_startproc
+ 268              		@ Function supports interworking.
+ 269              		@ args = 0, pretend = 0, frame = 0
+ 270              		@ frame_needed = 0, uses_anonymous_args = 0
+ 271              		@ link register save eliminated.
+ 130:uart.c        **** 	if(rx.nChars == 0){
+ 272              		.loc 1 130 0
+ 273 01bc 34309FE5 		ldr	r3, .L26
+ 274 01c0 341093E5 		ldr	r1, [r3, #52]
+ 275 01c4 000051E3 		cmp	r1, #0
+ 276 01c8 0800000A 		beq	.L25
+ 133:uart.c        **** 	unsigned char ret_val = *rx.rd_bffr;
+ 277              		.loc 1 133 0
+ 278 01cc 3C2093E5 		ldr	r2, [r3, #60]
+ 279 01d0 0100D2E4 		ldrb	r0, [r2], #1	@ zero_extendqisi2
+ 280              	.LVL8:
+ 136:uart.c        **** 	if(rx.rd_bffr > &rx.bffr[BUFFER_LENGTH]){
+ 281              		.loc 1 136 0
+ 282 01d4 32C083E2 		add	ip, r3, #50
+ 135:uart.c        **** 	rx.rd_bffr += sizeof(unsigned char);
+ 283              		.loc 1 135 0
+ 284 01d8 0C0052E1 		cmp	r2, ip
+ 134:uart.c        **** 	rx.nChars--;
+ 285              		.loc 1 134 0
+ 286 01dc 011041E2 		sub	r1, r1, #1
+ 135:uart.c        **** 	rx.rd_bffr += sizeof(unsigned char);
+ 287              		.loc 1 135 0
+ 288 01e0 0320A081 		movhi	r2, r3
+ 134:uart.c        **** 	rx.nChars--;
+ 289              		.loc 1 134 0
+ 290 01e4 341083E5 		str	r1, [r3, #52]
+ 135:uart.c        **** 	rx.rd_bffr += sizeof(unsigned char);
+ 291              		.loc 1 135 0
+ 292 01e8 3C2083E5 		str	r2, [r3, #60]
+ 293 01ec 1EFF2FE1 		bx	lr
+ 294              	.LVL9:
+ 295              	.L25:
+ 131:uart.c        **** 		return 0;
+ 296              		.loc 1 131 0
+ 297 01f0 0100A0E1 		mov	r0, r1
+ 140:uart.c        **** }
+ 298              		.loc 1 140 0
+ 299 01f4 1EFF2FE1 		bx	lr
+ 300              	.L27:
+ 301              		.align	2
+ 302              	.L26:
+ 303 01f8 00000000 		.word	rx
+ 304              		.cfi_endproc
+ 305              	.LFE286:
+ 307              		.align	2
+ 308              		.global	USART_RXavailable
+ 310              	USART_RXavailable:
+ 311              	.LFB287:
+ 143:uart.c        **** {
+ 312              		.loc 1 143 0
+ 313              		.cfi_startproc
+ 314              		@ Function supports interworking.
+ 315              		@ args = 0, pretend = 0, frame = 0
+ 316              		@ frame_needed = 0, uses_anonymous_args = 0
+ 317              		@ link register save eliminated.
+ 144:uart.c        **** 	return (pUSART->US_CSR & AT91C_US_RXRDY);
+ 318              		.loc 1 144 0
+ 319 01fc 0C309FE5 		ldr	r3, .L29
+ 320 0200 043093E5 		ldr	r3, [r3, #4]
+ 321 0204 140093E5 		ldr	r0, [r3, #20]
+ 145:uart.c        **** }
+ 322              		.loc 1 145 0
+ 323 0208 010000E2 		and	r0, r0, #1
+ 324 020c 1EFF2FE1 		bx	lr
+ 325              	.L30:
+ 326              		.align	2
+ 327              	.L29:
+ 328 0210 00000000 		.word	.LANCHOR0
+ 329              		.cfi_endproc
+ 330              	.LFE287:
+ 332              		.align	2
+ 333              		.global	USART_puts
+ 335              	USART_puts:
+ 336              	.LFB288:
+ 148:uart.c        **** {
+ 337              		.loc 1 148 0
+ 338              		.cfi_startproc
+ 339              		@ Function supports interworking.
+ 340              		@ args = 0, pretend = 0, frame = 0
+ 341              		@ frame_needed = 0, uses_anonymous_args = 0
+ 342              		@ link register save eliminated.
+ 343              	.LVL10:
+ 149:uart.c        **** 	while(*s != 0x00)
+ 344              		.loc 1 149 0
+ 345 0214 0010D0E5 		ldrb	r1, [r0, #0]	@ zero_extendqisi2
+ 346 0218 000051E3 		cmp	r1, #0
+ 347 021c 1EFF2F01 		bxeq	lr
+ 348 0220 3CC09FE5 		ldr	ip, .L44
+ 349 0224 00309CE5 		ldr	r3, [ip, #0]
+ 350              	.LBB40:
+ 351              	.LBB41:
+ 123:uart.c        **** 	if(!first) while(!(pUSART->US_CSR & AT91C_US_TXRDY));
+ 352              		.loc 1 123 0
+ 353 0228 000053E3 		cmp	r3, #0
+ 354 022c 04209CE5 		ldr	r2, [ip, #4]
+ 355              	.LVL11:
+ 356 0230 0200001A 		bne	.L33
+ 357              	.LVL12:
+ 358              	.L41:
+ 359 0234 143092E5 		ldr	r3, [r2, #20]
+ 360 0238 020013E3 		tst	r3, #2
+ 361 023c FCFFFF0A 		beq	.L41
+ 362              	.L33:
+ 124:uart.c        **** 	pUSART->US_THR = c;
+ 363              		.loc 1 124 0
+ 364 0240 1C1082E5 		str	r1, [r2, #28]
+ 365              	.LBE41:
+ 366              	.LBE40:
+ 149:uart.c        **** 	while(*s != 0x00)
+ 367              		.loc 1 149 0
+ 368 0244 0110F0E5 		ldrb	r1, [r0, #1]!	@ zero_extendqisi2
+ 369 0248 000051E3 		cmp	r1, #0
+ 370 024c 00108C05 		streq	r1, [ip, #0]
+ 371 0250 1EFF2F01 		bxeq	lr
+ 372              	.LBB43:
+ 373              	.LBB42:
+ 123:uart.c        **** 	if(!first) while(!(pUSART->US_CSR & AT91C_US_TXRDY));
+ 374              		.loc 1 123 0
+ 375 0254 143092E5 		ldr	r3, [r2, #20]
+ 376 0258 020013E3 		tst	r3, #2
+ 377 025c F4FFFF0A 		beq	.L41
+ 378 0260 F6FFFFEA 		b	.L33
+ 379              	.L45:
+ 380              		.align	2
+ 381              	.L44:
+ 382 0264 00000000 		.word	.LANCHOR0
+ 383              	.LBE42:
+ 384              	.LBE43:
+ 385              		.cfi_endproc
+ 386              	.LFE288:
+ 388              		.align	2
+ 389              		.global	disableIRQ
+ 391              	disableIRQ:
+ 392              	.LFB291:
+ 169:uart.c        **** {
+ 393              		.loc 1 169 0
+ 394              		.cfi_startproc
+ 395              		@ Function supports interworking.
+ 396              		@ args = 0, pretend = 0, frame = 0
+ 397              		@ frame_needed = 0, uses_anonymous_args = 0
+ 398              		@ link register save eliminated.
+ 399              	.LBB44:
+ 400              	.LBB45:
+ 159:uart.c        ****   asm volatile (" mrs  %0, cpsr" : "=r" (retval) :   );
+ 401              		.loc 1 159 0
+ 402              	@ 159 "uart.c" 1
+ 403 0268 00000FE1 		 mrs  r0, cpsr
+ 404              	@ 0 "" 2
+ 405              	.LVL13:
+ 406              	.LBE45:
+ 407              	.LBE44:
+ 173:uart.c        ****   __set_cpsr(_cpsr | IRQ_MASK);
+ 408              		.loc 1 173 0
+ 409 026c 803080E3 		orr	r3, r0, #128
+ 410              	.LBB46:
+ 411              	.LBB47:
+ 165:uart.c        ****   asm volatile (" msr  cpsr, %0" :  : "r" (val)  );
+ 412              		.loc 1 165 0
+ 413              	@ 165 "uart.c" 1
+ 414 0270 03F029E1 		 msr  cpsr, r3
+ 415              	@ 0 "" 2
+ 416              	.LBE47:
+ 417              	.LBE46:
+ 175:uart.c        **** }
+ 418              		.loc 1 175 0
+ 419 0274 1EFF2FE1 		bx	lr
+ 420              		.cfi_endproc
+ 421              	.LFE291:
+ 423              		.align	2
+ 424              		.global	restoreIRQ
+ 426              	restoreIRQ:
+ 427              	.LFB292:
+ 178:uart.c        **** {
+ 428              		.loc 1 178 0
+ 429              		.cfi_startproc
+ 430              		@ Function supports interworking.
+ 431              		@ args = 0, pretend = 0, frame = 0
+ 432              		@ frame_needed = 0, uses_anonymous_args = 0
+ 433              		@ link register save eliminated.
+ 434              	.LVL14:
+ 435              	.LBB48:
+ 436              	.LBB49:
+ 159:uart.c        ****   asm volatile (" mrs  %0, cpsr" : "=r" (retval) :   );
+ 437              		.loc 1 159 0
+ 438              	@ 159 "uart.c" 1
+ 439 0278 00300FE1 		 mrs  r3, cpsr
+ 440              	@ 0 "" 2
+ 441              	.LVL15:
+ 442              	.LBE49:
+ 443              	.LBE48:
+ 182:uart.c        ****   __set_cpsr((_cpsr & ~IRQ_MASK) | (oldCPSR & IRQ_MASK));
+ 444              		.loc 1 182 0
+ 445 027c 8020C3E3 		bic	r2, r3, #128
+ 446 0280 800000E2 		and	r0, r0, #128
+ 447              	.LVL16:
+ 448 0284 000082E1 		orr	r0, r2, r0
+ 449              	.LBB50:
+ 450              	.LBB51:
+ 165:uart.c        ****   asm volatile (" msr  cpsr, %0" :  : "r" (val)  );
+ 451              		.loc 1 165 0
+ 452              	@ 165 "uart.c" 1
+ 453 0288 00F029E1 		 msr  cpsr, r0
+ 454              	@ 0 "" 2
+ 455              	.LBE51:
+ 456              	.LBE50:
+ 184:uart.c        **** }
+ 457              		.loc 1 184 0
+ 458 028c 0300A0E1 		mov	r0, r3
+ 459 0290 1EFF2FE1 		bx	lr
+ 460              		.cfi_endproc
+ 461              	.LFE292:
+ 463              		.align	2
+ 464              		.global	enableIRQ
+ 466              	enableIRQ:
+ 467              	.LFB293:
+ 187:uart.c        **** {
+ 468              		.loc 1 187 0
+ 469              		.cfi_startproc
+ 470              		@ Function supports interworking.
+ 471              		@ args = 0, pretend = 0, frame = 0
+ 472              		@ frame_needed = 0, uses_anonymous_args = 0
+ 473              		@ link register save eliminated.
+ 474              	.LBB52:
+ 475              	.LBB53:
+ 159:uart.c        ****   asm volatile (" mrs  %0, cpsr" : "=r" (retval) :   );
+ 476              		.loc 1 159 0
+ 477              	@ 159 "uart.c" 1
+ 478 0294 00000FE1 		 mrs  r0, cpsr
+ 479              	@ 0 "" 2
+ 480              	.LVL17:
+ 481              	.LBE53:
+ 482              	.LBE52:
+ 483              		.loc 1 191 0
+ 484 0298 8030C0E3 		bic	r3, r0, #128
+ 485              	.LBB54:
+ 486              	.LBB55:
+ 165:uart.c        ****   asm volatile (" msr  cpsr, %0" :  : "r" (val)  );
+ 487              		.loc 1 165 0
+ 488              	@ 165 "uart.c" 1
+ 489 029c 03F029E1 		 msr  cpsr, r3
+ 490              	@ 0 "" 2
+ 491              	.LBE55:
+ 492              	.LBE54:
+ 192:uart.c        ****   return _cpsr;
+ 193:uart.c        **** }
+ 493              		.loc 1 193 0
+ 494 02a0 1EFF2FE1 		bx	lr
+ 495              		.cfi_endproc
+ 496              	.LFE293:
+ 498              		.align	2
+ 499              		.global	disableFIQ
+ 501              	disableFIQ:
+ 502              	.LFB294:
+ 194:uart.c        **** 
+ 195:uart.c        **** unsigned disableFIQ(void)
+ 196:uart.c        **** {
+ 503              		.loc 1 196 0
+ 504              		.cfi_startproc
+ 505              		@ Function supports interworking.
+ 506              		@ args = 0, pretend = 0, frame = 0
+ 507              		@ frame_needed = 0, uses_anonymous_args = 0
+ 508              		@ link register save eliminated.
+ 509              	.LBB56:
+ 510              	.LBB57:
+ 159:uart.c        ****   asm volatile (" mrs  %0, cpsr" : "=r" (retval) :   );
+ 511              		.loc 1 159 0
+ 512              	@ 159 "uart.c" 1
+ 513 02a4 00000FE1 		 mrs  r0, cpsr
+ 514              	@ 0 "" 2
+ 515              	.LVL18:
+ 516              	.LBE57:
+ 517              	.LBE56:
+ 197:uart.c        ****   unsigned _cpsr;
+ 198:uart.c        **** 
+ 199:uart.c        ****   _cpsr = __get_cpsr();
+ 200:uart.c        ****   __set_cpsr(_cpsr | FIQ_MASK);
+ 518              		.loc 1 200 0
+ 519 02a8 403080E3 		orr	r3, r0, #64
+ 520              	.LBB58:
+ 521              	.LBB59:
+ 165:uart.c        ****   asm volatile (" msr  cpsr, %0" :  : "r" (val)  );
+ 522              		.loc 1 165 0
+ 523              	@ 165 "uart.c" 1
+ 524 02ac 03F029E1 		 msr  cpsr, r3
+ 525              	@ 0 "" 2
+ 526              	.LBE59:
+ 527              	.LBE58:
+ 201:uart.c        ****   return _cpsr;
+ 202:uart.c        **** }
+ 528              		.loc 1 202 0
+ 529 02b0 1EFF2FE1 		bx	lr
+ 530              		.cfi_endproc
+ 531              	.LFE294:
+ 533              		.align	2
+ 534              		.global	restoreFIQ
+ 536              	restoreFIQ:
+ 537              	.LFB295:
+ 203:uart.c        **** 
+ 204:uart.c        **** unsigned restoreFIQ(unsigned oldCPSR)
+ 205:uart.c        **** {
+ 538              		.loc 1 205 0
+ 539              		.cfi_startproc
+ 540              		@ Function supports interworking.
+ 541              		@ args = 0, pretend = 0, frame = 0
+ 542              		@ frame_needed = 0, uses_anonymous_args = 0
+ 543              		@ link register save eliminated.
+ 544              	.LVL19:
+ 545              	.LBB60:
+ 546              	.LBB61:
+ 159:uart.c        ****   asm volatile (" mrs  %0, cpsr" : "=r" (retval) :   );
+ 547              		.loc 1 159 0
+ 548              	@ 159 "uart.c" 1
+ 549 02b4 00300FE1 		 mrs  r3, cpsr
+ 550              	@ 0 "" 2
+ 551              	.LVL20:
+ 552              	.LBE61:
+ 553              	.LBE60:
+ 206:uart.c        ****   unsigned _cpsr;
+ 207:uart.c        **** 
+ 208:uart.c        ****   _cpsr = __get_cpsr();
+ 209:uart.c        ****   __set_cpsr((_cpsr & ~FIQ_MASK) | (oldCPSR & FIQ_MASK));
+ 554              		.loc 1 209 0
+ 555 02b8 4020C3E3 		bic	r2, r3, #64
+ 556 02bc 400000E2 		and	r0, r0, #64
+ 557              	.LVL21:
+ 558 02c0 000082E1 		orr	r0, r2, r0
+ 559              	.LBB62:
+ 560              	.LBB63:
+ 165:uart.c        ****   asm volatile (" msr  cpsr, %0" :  : "r" (val)  );
+ 561              		.loc 1 165 0
+ 562              	@ 165 "uart.c" 1
+ 563 02c4 00F029E1 		 msr  cpsr, r0
+ 564              	@ 0 "" 2
+ 565              	.LBE63:
+ 566              	.LBE62:
+ 210:uart.c        ****   return _cpsr;
+ 211:uart.c        **** }
+ 567              		.loc 1 211 0
+ 568 02c8 0300A0E1 		mov	r0, r3
+ 569 02cc 1EFF2FE1 		bx	lr
+ 570              		.cfi_endproc
+ 571              	.LFE295:
+ 573              		.align	2
+ 574              		.global	enableFIQ
+ 576              	enableFIQ:
+ 577              	.LFB296:
+ 212:uart.c        **** 
+ 213:uart.c        **** unsigned enableFIQ(void)
+ 214:uart.c        **** {
+ 578              		.loc 1 214 0
+ 579              		.cfi_startproc
+ 580              		@ Function supports interworking.
+ 581              		@ args = 0, pretend = 0, frame = 0
+ 582              		@ frame_needed = 0, uses_anonymous_args = 0
+ 583              		@ link register save eliminated.
+ 584              	.LBB64:
+ 585              	.LBB65:
+ 159:uart.c        ****   asm volatile (" mrs  %0, cpsr" : "=r" (retval) :   );
+ 586              		.loc 1 159 0
+ 587              	@ 159 "uart.c" 1
+ 588 02d0 00000FE1 		 mrs  r0, cpsr
+ 589              	@ 0 "" 2
+ 590              	.LVL22:
+ 591              	.LBE65:
+ 592              	.LBE64:
+ 215:uart.c        ****   unsigned _cpsr;
+ 216:uart.c        **** 
+ 217:uart.c        ****   _cpsr = __get_cpsr();
+ 218:uart.c        ****   __set_cpsr(_cpsr & ~FIQ_MASK);
+ 593              		.loc 1 218 0
+ 594 02d4 4030C0E3 		bic	r3, r0, #64
+ 595              	.LBB66:
+ 596              	.LBB67:
+ 165:uart.c        ****   asm volatile (" msr  cpsr, %0" :  : "r" (val)  );
+ 597              		.loc 1 165 0
+ 598              	@ 165 "uart.c" 1
+ 599 02d8 03F029E1 		 msr  cpsr, r3
+ 600              	@ 0 "" 2
+ 601              	.LBE67:
+ 602              	.LBE66:
+ 219:uart.c        ****   return _cpsr;
+ 220:uart.c        **** }
+ 603              		.loc 1 220 0
+ 604 02dc 1EFF2FE1 		bx	lr
+ 605              		.cfi_endproc
+ 606              	.LFE296:
+ 608              		.comm	rx,64,4
+ 609              		.global	pUSART
+ 610              		.data
+ 611              		.align	2
+ 612              		.set	.LANCHOR0,. + 0
+ 615              	first.5696:
+ 616 0000 01000000 		.word	1
+ 619              	pUSART:
+ 620 0004 0000FCFF 		.word	-262144
+ 621              		.text
+ 622              	.Letext0:
+ 623              		.file 2 "board/AT91SAM7S256.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 uart.c
+     /tmp/cclYqFGe.s:16     .text:0000000000000000 $a
+     /tmp/cclYqFGe.s:19     .text:0000000000000000 Usart0IrqHandler
+     /tmp/cclYqFGe.s:78     .text:000000000000006c $d
+                            *COM*:0000000000000040 rx
+     /tmp/cclYqFGe.s:83     .text:0000000000000074 $a
+     /tmp/cclYqFGe.s:86     .text:0000000000000074 USART0Setup
+     /tmp/cclYqFGe.s:214    .text:0000000000000170 $d
+     /tmp/cclYqFGe.s:223    .text:0000000000000188 $a
+     /tmp/cclYqFGe.s:226    .text:0000000000000188 USART_putchar
+     /tmp/cclYqFGe.s:257    .text:00000000000001b8 $d
+     /tmp/cclYqFGe.s:261    .text:00000000000001bc $a
+     /tmp/cclYqFGe.s:264    .text:00000000000001bc USART_getchar
+     /tmp/cclYqFGe.s:303    .text:00000000000001f8 $d
+     /tmp/cclYqFGe.s:307    .text:00000000000001fc $a
+     /tmp/cclYqFGe.s:310    .text:00000000000001fc USART_RXavailable
+     /tmp/cclYqFGe.s:328    .text:0000000000000210 $d
+     /tmp/cclYqFGe.s:332    .text:0000000000000214 $a
+     /tmp/cclYqFGe.s:335    .text:0000000000000214 USART_puts
+     /tmp/cclYqFGe.s:382    .text:0000000000000264 $d
+     /tmp/cclYqFGe.s:388    .text:0000000000000268 $a
+     /tmp/cclYqFGe.s:391    .text:0000000000000268 disableIRQ
+     /tmp/cclYqFGe.s:426    .text:0000000000000278 restoreIRQ
+     /tmp/cclYqFGe.s:466    .text:0000000000000294 enableIRQ
+     /tmp/cclYqFGe.s:501    .text:00000000000002a4 disableFIQ
+     /tmp/cclYqFGe.s:536    .text:00000000000002b4 restoreFIQ
+     /tmp/cclYqFGe.s:576    .text:00000000000002d0 enableFIQ
+     /tmp/cclYqFGe.s:619    .data:0000000000000004 pUSART
+     /tmp/cclYqFGe.s:611    .data:0000000000000000 $d
+     /tmp/cclYqFGe.s:615    .data:0000000000000000 first.5696
+                     .debug_frame:0000000000000010 $d
+
+NO UNDEFINED SYMBOLS

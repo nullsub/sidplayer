@@ -1,0 +1,337 @@
+   1              		.cpu arm7tdmi
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 2
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.file	"board.c"
+  13              		.text
+  14              	.Ltext0:
+  15              		.cfi_sections	.debug_frame
+  16              		.align	2
+  17              		.global	delay_us
+  19              	delay_us:
+  20              	.LFB0:
+  21              		.file 1 "board/board.c"
+   1:board/board.c **** 
+   2:board/board.c **** void delay_us(int delay)
+   3:board/board.c **** {
+  22              		.loc 1 3 0
+  23              		.cfi_startproc
+  24              		@ Function supports interworking.
+  25              		@ args = 0, pretend = 0, frame = 0
+  26              		@ frame_needed = 0, uses_anonymous_args = 0
+  27              		@ link register save eliminated.
+  28              	.LVL0:
+   4:board/board.c ****   while(delay--)
+  29              		.loc 1 4 0
+  30 0000 000050E3 		cmp	r0, #0
+  31 0004 010040E2 		sub	r0, r0, #1
+  32              	.LVL1:
+  33 0008 1EFF2F01 		bxeq	lr
+  34              	.LVL2:
+  35              	.L6:
+   5:board/board.c ****   {
+   6:board/board.c ****       __asm ("NOP");
+  36              		.loc 1 6 0
+  37              	@ 6 "board/board.c" 1
+  38 000c 0000A0E1 		NOP
+  39              	@ 0 "" 2
+   7:board/board.c ****       __asm ("NOP");
+  40              		.loc 1 7 0
+  41              	@ 7 "board/board.c" 1
+  42 0010 0000A0E1 		NOP
+  43              	@ 0 "" 2
+   8:board/board.c ****       __asm ("NOP");
+  44              		.loc 1 8 0
+  45              	@ 8 "board/board.c" 1
+  46 0014 0000A0E1 		NOP
+  47              	@ 0 "" 2
+   9:board/board.c ****       __asm ("NOP");
+  48              		.loc 1 9 0
+  49              	@ 9 "board/board.c" 1
+  50 0018 0000A0E1 		NOP
+  51              	@ 0 "" 2
+  10:board/board.c ****       __asm ("NOP");
+  52              		.loc 1 10 0
+  53              	@ 10 "board/board.c" 1
+  54 001c 0000A0E1 		NOP
+  55              	@ 0 "" 2
+  11:board/board.c ****       __asm ("NOP");
+  56              		.loc 1 11 0
+  57              	@ 11 "board/board.c" 1
+  58 0020 0000A0E1 		NOP
+  59              	@ 0 "" 2
+  12:board/board.c ****       __asm ("NOP");
+  60              		.loc 1 12 0
+  61              	@ 12 "board/board.c" 1
+  62 0024 0000A0E1 		NOP
+  63              	@ 0 "" 2
+  13:board/board.c ****       __asm ("NOP");
+  64              		.loc 1 13 0
+  65              	@ 13 "board/board.c" 1
+  66 0028 0000A0E1 		NOP
+  67              	@ 0 "" 2
+  14:board/board.c ****       __asm ("NOP");
+  68              		.loc 1 14 0
+  69              	@ 14 "board/board.c" 1
+  70 002c 0000A0E1 		NOP
+  71              	@ 0 "" 2
+  15:board/board.c ****       __asm ("NOP");
+  72              		.loc 1 15 0
+  73              	@ 15 "board/board.c" 1
+  74 0030 0000A0E1 		NOP
+  75              	@ 0 "" 2
+  16:board/board.c ****       __asm ("NOP");
+  76              		.loc 1 16 0
+  77              	@ 16 "board/board.c" 1
+  78 0034 0000A0E1 		NOP
+  79              	@ 0 "" 2
+  17:board/board.c ****       __asm ("NOP");
+  80              		.loc 1 17 0
+  81              	@ 17 "board/board.c" 1
+  82 0038 0000A0E1 		NOP
+  83              	@ 0 "" 2
+  18:board/board.c ****       __asm ("NOP");
+  84              		.loc 1 18 0
+  85              	@ 18 "board/board.c" 1
+  86 003c 0000A0E1 		NOP
+  87              	@ 0 "" 2
+  19:board/board.c ****       __asm ("NOP");
+  88              		.loc 1 19 0
+  89              	@ 19 "board/board.c" 1
+  90 0040 0000A0E1 		NOP
+  91              	@ 0 "" 2
+  20:board/board.c ****       __asm ("NOP");
+  92              		.loc 1 20 0
+  93              	@ 20 "board/board.c" 1
+  94 0044 0000A0E1 		NOP
+  95              	@ 0 "" 2
+  21:board/board.c ****       __asm ("NOP");
+  96              		.loc 1 21 0
+  97              	@ 21 "board/board.c" 1
+  98 0048 0000A0E1 		NOP
+  99              	@ 0 "" 2
+  22:board/board.c ****       __asm ("NOP");
+ 100              		.loc 1 22 0
+ 101              	@ 22 "board/board.c" 1
+ 102 004c 0000A0E1 		NOP
+ 103              	@ 0 "" 2
+  23:board/board.c ****       __asm ("NOP");
+ 104              		.loc 1 23 0
+ 105              	@ 23 "board/board.c" 1
+ 106 0050 0000A0E1 		NOP
+ 107              	@ 0 "" 2
+  24:board/board.c ****       __asm ("NOP");
+ 108              		.loc 1 24 0
+ 109              	@ 24 "board/board.c" 1
+ 110 0054 0000A0E1 		NOP
+ 111              	@ 0 "" 2
+  25:board/board.c ****       __asm ("NOP");
+ 112              		.loc 1 25 0
+ 113              	@ 25 "board/board.c" 1
+ 114 0058 0000A0E1 		NOP
+ 115              	@ 0 "" 2
+  26:board/board.c ****       __asm ("NOP");
+ 116              		.loc 1 26 0
+ 117              	@ 26 "board/board.c" 1
+ 118 005c 0000A0E1 		NOP
+ 119              	@ 0 "" 2
+  27:board/board.c ****       __asm ("NOP");
+ 120              		.loc 1 27 0
+ 121              	@ 27 "board/board.c" 1
+ 122 0060 0000A0E1 		NOP
+ 123              	@ 0 "" 2
+  28:board/board.c ****       __asm ("NOP");
+ 124              		.loc 1 28 0
+ 125              	@ 28 "board/board.c" 1
+ 126 0064 0000A0E1 		NOP
+ 127              	@ 0 "" 2
+  29:board/board.c ****       __asm ("NOP");
+ 128              		.loc 1 29 0
+ 129              	@ 29 "board/board.c" 1
+ 130 0068 0000A0E1 		NOP
+ 131              	@ 0 "" 2
+  30:board/board.c ****       __asm ("NOP");
+ 132              		.loc 1 30 0
+ 133              	@ 30 "board/board.c" 1
+ 134 006c 0000A0E1 		NOP
+ 135              	@ 0 "" 2
+  31:board/board.c ****       __asm ("NOP");
+ 136              		.loc 1 31 0
+ 137              	@ 31 "board/board.c" 1
+ 138 0070 0000A0E1 		NOP
+ 139              	@ 0 "" 2
+  32:board/board.c ****       __asm ("NOP");
+ 140              		.loc 1 32 0
+ 141              	@ 32 "board/board.c" 1
+ 142 0074 0000A0E1 		NOP
+ 143              	@ 0 "" 2
+  33:board/board.c ****       __asm ("NOP");
+ 144              		.loc 1 33 0
+ 145              	@ 33 "board/board.c" 1
+ 146 0078 0000A0E1 		NOP
+ 147              	@ 0 "" 2
+  34:board/board.c ****       __asm ("NOP");
+ 148              		.loc 1 34 0
+ 149              	@ 34 "board/board.c" 1
+ 150 007c 0000A0E1 		NOP
+ 151              	@ 0 "" 2
+  35:board/board.c ****       __asm ("NOP");
+ 152              		.loc 1 35 0
+ 153              	@ 35 "board/board.c" 1
+ 154 0080 0000A0E1 		NOP
+ 155              	@ 0 "" 2
+  36:board/board.c ****       __asm ("NOP");
+ 156              		.loc 1 36 0
+ 157              	@ 36 "board/board.c" 1
+ 158 0084 0000A0E1 		NOP
+ 159              	@ 0 "" 2
+  37:board/board.c ****       __asm ("NOP");
+ 160              		.loc 1 37 0
+ 161              	@ 37 "board/board.c" 1
+ 162 0088 0000A0E1 		NOP
+ 163              	@ 0 "" 2
+  38:board/board.c ****       __asm ("NOP");
+ 164              		.loc 1 38 0
+ 165              	@ 38 "board/board.c" 1
+ 166 008c 0000A0E1 		NOP
+ 167              	@ 0 "" 2
+  39:board/board.c ****       __asm ("NOP");
+ 168              		.loc 1 39 0
+ 169              	@ 39 "board/board.c" 1
+ 170 0090 0000A0E1 		NOP
+ 171              	@ 0 "" 2
+  40:board/board.c ****       __asm ("NOP");
+ 172              		.loc 1 40 0
+ 173              	@ 40 "board/board.c" 1
+ 174 0094 0000A0E1 		NOP
+ 175              	@ 0 "" 2
+  41:board/board.c ****       __asm ("NOP");
+ 176              		.loc 1 41 0
+ 177              	@ 41 "board/board.c" 1
+ 178 0098 0000A0E1 		NOP
+ 179              	@ 0 "" 2
+  42:board/board.c ****       __asm ("NOP");
+ 180              		.loc 1 42 0
+ 181              	@ 42 "board/board.c" 1
+ 182 009c 0000A0E1 		NOP
+ 183              	@ 0 "" 2
+  43:board/board.c ****       __asm ("NOP");
+ 184              		.loc 1 43 0
+ 185              	@ 43 "board/board.c" 1
+ 186 00a0 0000A0E1 		NOP
+ 187              	@ 0 "" 2
+  44:board/board.c ****       __asm ("NOP");
+ 188              		.loc 1 44 0
+ 189              	@ 44 "board/board.c" 1
+ 190 00a4 0000A0E1 		NOP
+ 191              	@ 0 "" 2
+  45:board/board.c ****       __asm ("NOP");
+ 192              		.loc 1 45 0
+ 193              	@ 45 "board/board.c" 1
+ 194 00a8 0000A0E1 		NOP
+ 195              	@ 0 "" 2
+  46:board/board.c ****       __asm ("NOP");
+ 196              		.loc 1 46 0
+ 197              	@ 46 "board/board.c" 1
+ 198 00ac 0000A0E1 		NOP
+ 199              	@ 0 "" 2
+  47:board/board.c ****       __asm ("NOP");
+ 200              		.loc 1 47 0
+ 201              	@ 47 "board/board.c" 1
+ 202 00b0 0000A0E1 		NOP
+ 203              	@ 0 "" 2
+  48:board/board.c ****       __asm ("NOP");
+ 204              		.loc 1 48 0
+ 205              	@ 48 "board/board.c" 1
+ 206 00b4 0000A0E1 		NOP
+ 207              	@ 0 "" 2
+ 208              	.LVL3:
+   4:board/board.c ****   while(delay--)
+ 209              		.loc 1 4 0
+ 210 00b8 010050E2 		subs	r0, r0, #1
+ 211              	.LVL4:
+ 212 00bc D2FFFF2A 		bcs	.L6
+ 213 00c0 1EFF2FE1 		bx	lr
+ 214              		.cfi_endproc
+ 215              	.LFE0:
+ 217              		.align	2
+ 218              		.global	delay_ms
+ 220              	delay_ms:
+ 221              	.LFB1:
+  49:board/board.c ****   }
+  50:board/board.c **** }
+  51:board/board.c **** 
+  52:board/board.c **** void delay_ms(int delay)
+  53:board/board.c **** {
+ 222              		.loc 1 53 0
+ 223              		.cfi_startproc
+ 224              		@ Function supports interworking.
+ 225              		@ args = 0, pretend = 0, frame = 0
+ 226              		@ frame_needed = 1, uses_anonymous_args = 0
+ 227              	.LVL5:
+ 228 00c4 0DC0A0E1 		mov	ip, sp
+ 229              	.LCFI0:
+ 230              		.cfi_def_cfa_register 12
+ 231 00c8 30D82DE9 		stmfd	sp!, {r4, r5, fp, ip, lr, pc}
+ 232              		.cfi_offset 4, -24
+ 233              		.cfi_offset 5, -20
+ 234              		.cfi_offset 11, -16
+ 235              		.cfi_offset 13, -12
+ 236              		.cfi_offset 14, -8
+ 237              	.LBB2:
+  54:board/board.c **** 	for(int i= 0; i< delay; i++) {
+ 238              		.loc 1 54 0
+ 239 00cc 005050E2 		subs	r5, r0, #0
+ 240              	.LBE2:
+  53:board/board.c **** {
+ 241              		.loc 1 53 0
+ 242 00d0 04B04CE2 		sub	fp, ip, #4
+ 243              	.LCFI1:
+ 244              		.cfi_def_cfa 11, 4
+ 245              	.LBB3:
+ 246              		.loc 1 54 0
+ 247 00d4 050000DA 		ble	.L10
+ 248 00d8 0040A0E3 		mov	r4, #0
+ 249              	.LVL6:
+ 250              	.L11:
+  55:board/board.c **** 		delay_us(1000);
+ 251              		.loc 1 55 0 discriminator 2
+ 252 00dc FA0FA0E3 		mov	r0, #1000
+  54:board/board.c **** 	for(int i= 0; i< delay; i++) {
+ 253              		.loc 1 54 0 discriminator 2
+ 254 00e0 014084E2 		add	r4, r4, #1
+ 255              		.loc 1 55 0 discriminator 2
+ 256 00e4 FEFFFFEB 		bl	delay_us
+ 257              	.LVL7:
+  54:board/board.c **** 	for(int i= 0; i< delay; i++) {
+ 258              		.loc 1 54 0 discriminator 2
+ 259 00e8 050054E1 		cmp	r4, r5
+ 260 00ec FAFFFF1A 		bne	.L11
+ 261              	.LVL8:
+ 262              	.L10:
+ 263              	.LBE3:
+  56:board/board.c **** 	}
+  57:board/board.c **** 
+  58:board/board.c **** }
+ 264              		.loc 1 58 0
+ 265 00f0 14D04BE2 		sub	sp, fp, #20
+ 266 00f4 30689DE8 		ldmfd	sp, {r4, r5, fp, sp, lr}
+ 267 00f8 1EFF2FE1 		bx	lr
+ 268              		.cfi_endproc
+ 269              	.LFE1:
+ 271              	.Letext0:
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 board.c
+     /tmp/ccW9SPrs.s:16     .text:0000000000000000 $a
+     /tmp/ccW9SPrs.s:19     .text:0000000000000000 delay_us
+     /tmp/ccW9SPrs.s:220    .text:00000000000000c4 delay_ms
+                     .debug_frame:0000000000000010 $d
+
+NO UNDEFINED SYMBOLS

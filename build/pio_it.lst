@@ -1,0 +1,692 @@
+   1              		.cpu arm7tdmi
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 2
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.file	"pio_it.c"
+  13              		.text
+  14              	.Ltext0:
+  15              		.cfi_sections	.debug_frame
+  16              		.align	2
+  18              	InterruptHandler:
+  19              	.LFB284:
+  20              		.file 1 "board/peripherals/pio/pio_it.c"
+   1:board/peripherals/pio/pio_it.c **** /* ----------------------------------------------------------------------------
+   2:board/peripherals/pio/pio_it.c ****  *         ATMEL Microcontroller Software Support 
+   3:board/peripherals/pio/pio_it.c ****  * ----------------------------------------------------------------------------
+   4:board/peripherals/pio/pio_it.c ****  * Copyright (c) 2008, Atmel Corporation
+   5:board/peripherals/pio/pio_it.c ****  *
+   6:board/peripherals/pio/pio_it.c ****  * All rights reserved.
+   7:board/peripherals/pio/pio_it.c ****  *
+   8:board/peripherals/pio/pio_it.c ****  * Redistribution and use in source and binary forms, with or without
+   9:board/peripherals/pio/pio_it.c ****  * modification, are permitted provided that the following conditions are met:
+  10:board/peripherals/pio/pio_it.c ****  *
+  11:board/peripherals/pio/pio_it.c ****  * - Redistributions of source code must retain the above copyright notice,
+  12:board/peripherals/pio/pio_it.c ****  * this list of conditions and the disclaimer below.
+  13:board/peripherals/pio/pio_it.c ****  *
+  14:board/peripherals/pio/pio_it.c ****  * Atmel's name may not be used to endorse or promote products derived from
+  15:board/peripherals/pio/pio_it.c ****  * this software without specific prior written permission.
+  16:board/peripherals/pio/pio_it.c ****  *
+  17:board/peripherals/pio/pio_it.c ****  * DISCLAIMER: THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR
+  18:board/peripherals/pio/pio_it.c ****  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+  19:board/peripherals/pio/pio_it.c ****  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
+  20:board/peripherals/pio/pio_it.c ****  * DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR ANY DIRECT, INDIRECT,
+  21:board/peripherals/pio/pio_it.c ****  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  22:board/peripherals/pio/pio_it.c ****  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+  23:board/peripherals/pio/pio_it.c ****  * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+  24:board/peripherals/pio/pio_it.c ****  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+  25:board/peripherals/pio/pio_it.c ****  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+  26:board/peripherals/pio/pio_it.c ****  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  27:board/peripherals/pio/pio_it.c ****  * ----------------------------------------------------------------------------
+  28:board/peripherals/pio/pio_it.c ****  */
+  29:board/peripherals/pio/pio_it.c **** 
+  30:board/peripherals/pio/pio_it.c **** /// Disable traces for this file
+  31:board/peripherals/pio/pio_it.c **** #undef TRACE_LEVEL
+  32:board/peripherals/pio/pio_it.c **** #define TRACE_LEVEL 0
+  33:board/peripherals/pio/pio_it.c **** 
+  34:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+  35:board/peripherals/pio/pio_it.c **** //         Headers
+  36:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+  37:board/peripherals/pio/pio_it.c **** 
+  38:board/peripherals/pio/pio_it.c **** #include "pio_it.h"
+  39:board/peripherals/pio/pio_it.c **** #include "pio.h"
+  40:board/peripherals/pio/pio_it.c **** #include <board.h>
+  41:board/peripherals/pio/pio_it.c **** #include <aic/aic.h>
+  42:board/peripherals/pio/pio_it.c **** //#include <utility/assert.h>
+  43:board/peripherals/pio/pio_it.c **** //#include <utility/trace.h>
+  44:board/peripherals/pio/pio_it.c **** 
+  45:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+  46:board/peripherals/pio/pio_it.c **** //         Local definitions
+  47:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+  48:board/peripherals/pio/pio_it.c **** 
+  49:board/peripherals/pio/pio_it.c **** /// \exclude
+  50:board/peripherals/pio/pio_it.c **** /// Maximum number of interrupt sources that can be defined. This
+  51:board/peripherals/pio/pio_it.c **** /// constant can be increased, but the current value is the smallest possible
+  52:board/peripherals/pio/pio_it.c **** /// that will be compatible with all existing projects.
+  53:board/peripherals/pio/pio_it.c **** #define MAX_INTERRUPT_SOURCES       7
+  54:board/peripherals/pio/pio_it.c **** 
+  55:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+  56:board/peripherals/pio/pio_it.c **** //         Local types
+  57:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+  58:board/peripherals/pio/pio_it.c **** 
+  59:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+  60:board/peripherals/pio/pio_it.c **** /// \exclude
+  61:board/peripherals/pio/pio_it.c **** /// Describes a PIO interrupt source, including the PIO instance triggering the
+  62:board/peripherals/pio/pio_it.c **** /// interrupt and the associated interrupt handler.
+  63:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+  64:board/peripherals/pio/pio_it.c **** typedef struct {
+  65:board/peripherals/pio/pio_it.c **** 
+  66:board/peripherals/pio/pio_it.c ****     /// Pointer to the source pin instance.
+  67:board/peripherals/pio/pio_it.c ****     const Pin *pPin;
+  68:board/peripherals/pio/pio_it.c **** 
+  69:board/peripherals/pio/pio_it.c ****     /// Interrupt handler.
+  70:board/peripherals/pio/pio_it.c ****     void (*handler)(const Pin *);
+  71:board/peripherals/pio/pio_it.c **** 
+  72:board/peripherals/pio/pio_it.c **** } InterruptSource;
+  73:board/peripherals/pio/pio_it.c **** 
+  74:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+  75:board/peripherals/pio/pio_it.c **** //         Local variables
+  76:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+  77:board/peripherals/pio/pio_it.c **** 
+  78:board/peripherals/pio/pio_it.c **** /// List of interrupt sources.
+  79:board/peripherals/pio/pio_it.c **** static InterruptSource pSources[MAX_INTERRUPT_SOURCES];
+  80:board/peripherals/pio/pio_it.c **** 
+  81:board/peripherals/pio/pio_it.c **** /// Number of currently defined interrupt sources.
+  82:board/peripherals/pio/pio_it.c **** static unsigned int numSources;
+  83:board/peripherals/pio/pio_it.c **** 
+  84:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+  85:board/peripherals/pio/pio_it.c **** //         Local functions
+  86:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+  87:board/peripherals/pio/pio_it.c **** 
+  88:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+  89:board/peripherals/pio/pio_it.c **** /// Handles all interrupts on the given PIO controller.
+  90:board/peripherals/pio/pio_it.c **** /// \param id  PIO controller ID.
+  91:board/peripherals/pio/pio_it.c **** /// \param pPio  PIO controller base address.
+  92:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+  93:board/peripherals/pio/pio_it.c **** static void PioInterruptHandler(unsigned int id, AT91S_PIO *pPio)
+  94:board/peripherals/pio/pio_it.c **** {
+  95:board/peripherals/pio/pio_it.c ****     unsigned int status;
+  96:board/peripherals/pio/pio_it.c ****     unsigned int i;
+  97:board/peripherals/pio/pio_it.c **** 
+  98:board/peripherals/pio/pio_it.c ****     // Read PIO controller status
+  99:board/peripherals/pio/pio_it.c ****     status = pPio->PIO_ISR;
+ 100:board/peripherals/pio/pio_it.c ****     status &= pPio->PIO_IMR;
+ 101:board/peripherals/pio/pio_it.c **** 
+ 102:board/peripherals/pio/pio_it.c ****     // Check pending events
+ 103:board/peripherals/pio/pio_it.c ****     if (status != 0) {
+ 104:board/peripherals/pio/pio_it.c **** 
+ 105:board/peripherals/pio/pio_it.c ****        // TRACE_DEBUG("PIO interrupt on PIO controller #%d\n\r", id);
+ 106:board/peripherals/pio/pio_it.c **** 
+ 107:board/peripherals/pio/pio_it.c ****         // Find triggering source
+ 108:board/peripherals/pio/pio_it.c ****         i = 0;
+ 109:board/peripherals/pio/pio_it.c ****         while (status != 0) {
+ 110:board/peripherals/pio/pio_it.c **** 
+ 111:board/peripherals/pio/pio_it.c ****             // There cannot be an unconfigured source enabled.
+ 112:board/peripherals/pio/pio_it.c ****             //SANITY_CHECK(i < numSources);
+ 113:board/peripherals/pio/pio_it.c **** 
+ 114:board/peripherals/pio/pio_it.c ****             // Source is configured on the same controller
+ 115:board/peripherals/pio/pio_it.c ****             if (pSources[i].pPin->id == id) {
+ 116:board/peripherals/pio/pio_it.c **** 
+ 117:board/peripherals/pio/pio_it.c ****                 // Source has PIOs whose statuses have changed
+ 118:board/peripherals/pio/pio_it.c ****                 if ((status & pSources[i].pPin->mask) != 0) {
+ 119:board/peripherals/pio/pio_it.c **** 
+ 120:board/peripherals/pio/pio_it.c ****                     //TRACE_DEBUG("Interrupt source #%d triggered\n\r", i);
+ 121:board/peripherals/pio/pio_it.c **** 
+ 122:board/peripherals/pio/pio_it.c ****                     pSources[i].handler(pSources[i].pPin);
+ 123:board/peripherals/pio/pio_it.c ****                     status &= ~(pSources[i].pPin->mask);
+ 124:board/peripherals/pio/pio_it.c ****                 }
+ 125:board/peripherals/pio/pio_it.c ****             }
+ 126:board/peripherals/pio/pio_it.c ****             i++;
+ 127:board/peripherals/pio/pio_it.c ****         }
+ 128:board/peripherals/pio/pio_it.c ****     }
+ 129:board/peripherals/pio/pio_it.c **** }
+ 130:board/peripherals/pio/pio_it.c **** 
+ 131:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+ 132:board/peripherals/pio/pio_it.c **** /// Generic PIO interrupt handler. Single entry point for interrupts coming
+ 133:board/peripherals/pio/pio_it.c **** /// from any PIO controller (PIO A, B, C ...). Dispatches the interrupt to
+ 134:board/peripherals/pio/pio_it.c **** /// the user-configured handlers.
+ 135:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+ 136:board/peripherals/pio/pio_it.c **** static void InterruptHandler(void)
+ 137:board/peripherals/pio/pio_it.c **** {
+  21              		.loc 1 137 0
+  22              		.cfi_startproc
+  23              		@ Function supports interworking.
+  24              		@ args = 0, pretend = 0, frame = 0
+  25              		@ frame_needed = 1, uses_anonymous_args = 0
+  26              	.LVL0:
+  27 0000 0DC0A0E1 		mov	ip, sp
+  28              	.LCFI0:
+  29              		.cfi_def_cfa_register 12
+  30              	.LBB4:
+  31              	.LBB5:
+  99:board/peripherals/pio/pio_it.c ****     status = pPio->PIO_ISR;
+  32              		.loc 1 99 0
+  33 0004 0020E0E3 		mvn	r2, #0
+  34              	.LBE5:
+  35              	.LBE4:
+  36              		.loc 1 137 0
+  37 0008 F0D82DE9 		stmfd	sp!, {r4, r5, r6, r7, fp, ip, lr, pc}
+  38              	.LBB8:
+  39              	.LBB6:
+  99:board/peripherals/pio/pio_it.c ****     status = pPio->PIO_ISR;
+  40              		.loc 1 99 0
+  41 000c B33B12E5 		ldr	r3, [r2, #-2995]
+  42              	.LVL1:
+  43              		.cfi_offset 4, -32
+  44              		.cfi_offset 5, -28
+  45              		.cfi_offset 6, -24
+  46              		.cfi_offset 7, -20
+  47              		.cfi_offset 11, -16
+  48              		.cfi_offset 13, -12
+  49              		.cfi_offset 14, -8
+ 100:board/peripherals/pio/pio_it.c ****     status &= pPio->PIO_IMR;
+  50              		.loc 1 100 0
+  51 0010 B75B12E5 		ldr	r5, [r2, #-2999]
+  52              	.LVL2:
+ 103:board/peripherals/pio/pio_it.c ****     if (status != 0) {
+  53              		.loc 1 103 0
+  54 0014 035015E0 		ands	r5, r5, r3
+  55              	.LVL3:
+  56              	.LBE6:
+  57              	.LBE8:
+  58              		.loc 1 137 0
+  59 0018 04B04CE2 		sub	fp, ip, #4
+  60              	.LCFI1:
+  61              		.cfi_def_cfa 11, 4
+  62              	.LBB9:
+  63              	.LBB7:
+ 103:board/peripherals/pio/pio_it.c ****     if (status != 0) {
+  64              		.loc 1 103 0
+  65 001c 1700000A 		beq	.L1
+  66 0020 64609FE5 		ldr	r6, .L11
+  67 0024 0040A0E3 		mov	r4, #0
+ 115:board/peripherals/pio/pio_it.c ****             if (pSources[i].pPin->id == id) {
+  68              		.loc 1 115 0
+  69 0028 0670A0E1 		mov	r7, r6
+  70 002c 020000EA 		b	.L2
+  71              	.L3:
+  72              	.LVL4:
+ 109:board/peripherals/pio/pio_it.c ****         while (status != 0) {
+  73              		.loc 1 109 0
+  74 0030 000055E3 		cmp	r5, #0
+  75 0034 084084E2 		add	r4, r4, #8
+  76 0038 1000000A 		beq	.L1
+  77              	.L2:
+ 115:board/peripherals/pio/pio_it.c ****             if (pSources[i].pPin->id == id) {
+  78              		.loc 1 115 0
+  79 003c 040096E7 		ldr	r0, [r6, r4]
+  80 0040 0830D0E5 		ldrb	r3, [r0, #8]	@ zero_extendqisi2
+  81 0044 020053E3 		cmp	r3, #2
+  82 0048 F8FFFF1A 		bne	.L3
+ 118:board/peripherals/pio/pio_it.c ****                 if ((status & pSources[i].pPin->mask) != 0) {
+  83              		.loc 1 118 0
+  84 004c 003090E5 		ldr	r3, [r0, #0]
+  85 0050 030015E1 		tst	r5, r3
+  86 0054 F5FFFF0A 		beq	.L3
+ 136:board/peripherals/pio/pio_it.c **** static void InterruptHandler(void)
+  87              		.loc 1 136 0
+  88 0058 043087E0 		add	r3, r7, r4
+ 122:board/peripherals/pio/pio_it.c ****                     pSources[i].handler(pSources[i].pPin);
+  89              		.loc 1 122 0
+  90 005c 04C093E5 		ldr	ip, [r3, #4]
+  91 0060 0FE0A0E1 		mov	lr, pc
+  92 0064 1CFF2FE1 		bx	ip
+  93              	.LVL5:
+ 123:board/peripherals/pio/pio_it.c ****                     status &= ~(pSources[i].pPin->mask);
+  94              		.loc 1 123 0
+  95 0068 073094E7 		ldr	r3, [r4, r7]
+  96 006c 003093E5 		ldr	r3, [r3, #0]
+  97 0070 0350C5E1 		bic	r5, r5, r3
+  98              	.LVL6:
+ 109:board/peripherals/pio/pio_it.c ****         while (status != 0) {
+  99              		.loc 1 109 0
+ 100 0074 000055E3 		cmp	r5, #0
+ 101 0078 084084E2 		add	r4, r4, #8
+ 102 007c EEFFFF1A 		bne	.L2
+ 103              	.L1:
+ 104              	.LBE7:
+ 105              	.LBE9:
+ 138:board/peripherals/pio/pio_it.c **** #if defined(AT91C_ID_PIOA)
+ 139:board/peripherals/pio/pio_it.c ****     // Treat PIOA interrupts
+ 140:board/peripherals/pio/pio_it.c ****     PioInterruptHandler(AT91C_ID_PIOA, AT91C_BASE_PIOA);
+ 141:board/peripherals/pio/pio_it.c **** #endif
+ 142:board/peripherals/pio/pio_it.c **** 
+ 143:board/peripherals/pio/pio_it.c **** #if defined(AT91C_ID_PIOB)
+ 144:board/peripherals/pio/pio_it.c ****     // Treat PIOB interrupts
+ 145:board/peripherals/pio/pio_it.c ****     PioInterruptHandler(AT91C_ID_PIOB, AT91C_BASE_PIOB);
+ 146:board/peripherals/pio/pio_it.c **** #endif
+ 147:board/peripherals/pio/pio_it.c **** 
+ 148:board/peripherals/pio/pio_it.c **** #if defined(AT91C_ID_PIOC)
+ 149:board/peripherals/pio/pio_it.c ****     // Treat PIOC interrupts
+ 150:board/peripherals/pio/pio_it.c ****     PioInterruptHandler(AT91C_ID_PIOC, AT91C_BASE_PIOC);
+ 151:board/peripherals/pio/pio_it.c **** #endif
+ 152:board/peripherals/pio/pio_it.c **** 
+ 153:board/peripherals/pio/pio_it.c **** #if defined(AT91C_ID_PIOD)
+ 154:board/peripherals/pio/pio_it.c ****     // Treat PIOD interrupts
+ 155:board/peripherals/pio/pio_it.c ****     PioInterruptHandler(AT91C_ID_PIOD, AT91C_BASE_PIOD);
+ 156:board/peripherals/pio/pio_it.c **** #endif
+ 157:board/peripherals/pio/pio_it.c **** 
+ 158:board/peripherals/pio/pio_it.c **** #if defined(AT91C_ID_PIOE)
+ 159:board/peripherals/pio/pio_it.c ****     // Treat PIOE interrupts
+ 160:board/peripherals/pio/pio_it.c ****     PioInterruptHandler(AT91C_ID_PIOE, AT91C_BASE_PIOE);
+ 161:board/peripherals/pio/pio_it.c **** #endif
+ 162:board/peripherals/pio/pio_it.c **** 
+ 163:board/peripherals/pio/pio_it.c **** #if defined(AT91C_ID_PIOABCD)
+ 164:board/peripherals/pio/pio_it.c ****     // Treat PIOABCD interrupts
+ 165:board/peripherals/pio/pio_it.c ****     #if !defined(AT91C_ID_PIOA)
+ 166:board/peripherals/pio/pio_it.c ****         PioInterruptHandler(AT91C_ID_PIOABCD, AT91C_BASE_PIOA);
+ 167:board/peripherals/pio/pio_it.c ****     #endif
+ 168:board/peripherals/pio/pio_it.c ****     #if !defined(AT91C_ID_PIOB)
+ 169:board/peripherals/pio/pio_it.c ****         PioInterruptHandler(AT91C_ID_PIOABCD, AT91C_BASE_PIOB);
+ 170:board/peripherals/pio/pio_it.c ****     #endif
+ 171:board/peripherals/pio/pio_it.c ****     #if !defined(AT91C_ID_PIOC)
+ 172:board/peripherals/pio/pio_it.c ****         PioInterruptHandler(AT91C_ID_PIOABCD, AT91C_BASE_PIOC);
+ 173:board/peripherals/pio/pio_it.c ****     #endif
+ 174:board/peripherals/pio/pio_it.c ****     #if !defined(AT91C_ID_PIOD)
+ 175:board/peripherals/pio/pio_it.c ****         PioInterruptHandler(AT91C_ID_PIOABCD, AT91C_BASE_PIOD);
+ 176:board/peripherals/pio/pio_it.c ****     #endif
+ 177:board/peripherals/pio/pio_it.c **** #endif
+ 178:board/peripherals/pio/pio_it.c **** 
+ 179:board/peripherals/pio/pio_it.c **** #if defined(AT91C_ID_PIOABCDE)
+ 180:board/peripherals/pio/pio_it.c ****     // Treat PIOABCDE interrupts
+ 181:board/peripherals/pio/pio_it.c ****     #if !defined(AT91C_ID_PIOA)
+ 182:board/peripherals/pio/pio_it.c ****         PioInterruptHandler(AT91C_ID_PIOABCDE, AT91C_BASE_PIOA);
+ 183:board/peripherals/pio/pio_it.c ****     #endif
+ 184:board/peripherals/pio/pio_it.c ****     #if !defined(AT91C_ID_PIOB)
+ 185:board/peripherals/pio/pio_it.c ****         PioInterruptHandler(AT91C_ID_PIOABCDE, AT91C_BASE_PIOB);
+ 186:board/peripherals/pio/pio_it.c ****     #endif
+ 187:board/peripherals/pio/pio_it.c ****     #if !defined(AT91C_ID_PIOC)
+ 188:board/peripherals/pio/pio_it.c ****         PioInterruptHandler(AT91C_ID_PIOABCDE, AT91C_BASE_PIOC);
+ 189:board/peripherals/pio/pio_it.c ****     #endif
+ 190:board/peripherals/pio/pio_it.c ****     #if !defined(AT91C_ID_PIOD)
+ 191:board/peripherals/pio/pio_it.c ****         PioInterruptHandler(AT91C_ID_PIOABCDE, AT91C_BASE_PIOD);
+ 192:board/peripherals/pio/pio_it.c ****     #endif
+ 193:board/peripherals/pio/pio_it.c ****     #if !defined(AT91C_ID_PIOE)
+ 194:board/peripherals/pio/pio_it.c ****         PioInterruptHandler(AT91C_ID_PIOABCDE, AT91C_BASE_PIOE);
+ 195:board/peripherals/pio/pio_it.c ****     #endif
+ 196:board/peripherals/pio/pio_it.c **** #endif
+ 197:board/peripherals/pio/pio_it.c **** 
+ 198:board/peripherals/pio/pio_it.c **** #if defined(AT91C_ID_PIOCDE)
+ 199:board/peripherals/pio/pio_it.c ****     // Treat PIOCDE interrupts
+ 200:board/peripherals/pio/pio_it.c ****     #if !defined(AT91C_ID_PIOC)
+ 201:board/peripherals/pio/pio_it.c ****         PioInterruptHandler(AT91C_ID_PIOCDE, AT91C_BASE_PIOC);
+ 202:board/peripherals/pio/pio_it.c ****     #endif
+ 203:board/peripherals/pio/pio_it.c ****     #if !defined(AT91C_ID_PIOD)
+ 204:board/peripherals/pio/pio_it.c ****         PioInterruptHandler(AT91C_ID_PIOCDE, AT91C_BASE_PIOD);
+ 205:board/peripherals/pio/pio_it.c ****     #endif
+ 206:board/peripherals/pio/pio_it.c ****     #if !defined(AT91C_ID_PIOE)
+ 207:board/peripherals/pio/pio_it.c ****         PioInterruptHandler(AT91C_ID_PIOCDE, AT91C_BASE_PIOE);
+ 208:board/peripherals/pio/pio_it.c ****     #endif
+ 209:board/peripherals/pio/pio_it.c **** #endif
+ 210:board/peripherals/pio/pio_it.c **** }
+ 106              		.loc 1 210 0
+ 107 0080 1CD04BE2 		sub	sp, fp, #28
+ 108 0084 F0689DE8 		ldmfd	sp, {r4, r5, r6, r7, fp, sp, lr}
+ 109 0088 1EFF2FE1 		bx	lr
+ 110              	.L12:
+ 111              		.align	2
+ 112              	.L11:
+ 113 008c 00000000 		.word	.LANCHOR0
+ 114              		.cfi_endproc
+ 115              	.LFE284:
+ 117              		.align	2
+ 118              		.global	PIO_InitializeInterrupts
+ 120              	PIO_InitializeInterrupts:
+ 121              	.LFB285:
+ 211:board/peripherals/pio/pio_it.c **** 
+ 212:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+ 213:board/peripherals/pio/pio_it.c **** //         Global functions
+ 214:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+ 215:board/peripherals/pio/pio_it.c **** 
+ 216:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+ 217:board/peripherals/pio/pio_it.c **** /// Initializes the PIO interrupt management logic. The desired priority of PIO
+ 218:board/peripherals/pio/pio_it.c **** /// interrupts must be provided. Calling this function multiple times result in
+ 219:board/peripherals/pio/pio_it.c **** /// the reset of currently configured interrupts.
+ 220:board/peripherals/pio/pio_it.c **** /// \param priority  PIO controller interrupts priority.
+ 221:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+ 222:board/peripherals/pio/pio_it.c **** void PIO_InitializeInterrupts(unsigned int priority)
+ 223:board/peripherals/pio/pio_it.c **** {
+ 122              		.loc 1 223 0
+ 123              		.cfi_startproc
+ 124              		@ Function supports interworking.
+ 125              		@ args = 0, pretend = 0, frame = 0
+ 126              		@ frame_needed = 1, uses_anonymous_args = 0
+ 127              	.LVL7:
+ 224:board/peripherals/pio/pio_it.c ****     //TRACE_DEBUG("PIO_Initialize()\n\r");
+ 225:board/peripherals/pio/pio_it.c **** 
+ 226:board/peripherals/pio/pio_it.c ****     //SANITY_CHECK((priority & ~AT91C_AIC_PRIOR) == 0);
+ 227:board/peripherals/pio/pio_it.c **** 
+ 228:board/peripherals/pio/pio_it.c ****     // Reset sources
+ 229:board/peripherals/pio/pio_it.c ****     numSources = 0;
+ 230:board/peripherals/pio/pio_it.c **** 
+ 231:board/peripherals/pio/pio_it.c **** #ifdef AT91C_ID_PIOA
+ 232:board/peripherals/pio/pio_it.c ****     // Configure PIO interrupt sources
+ 233:board/peripherals/pio/pio_it.c ****     //TRACE_DEBUG("PIO_Initialize: Configuring PIOA\n\r");
+ 234:board/peripherals/pio/pio_it.c ****     AT91C_BASE_PMC->PMC_PCER = 1 << AT91C_ID_PIOA;
+ 128              		.loc 1 234 0
+ 129 0090 0030E0E3 		mvn	r3, #0
+ 223:board/peripherals/pio/pio_it.c **** {
+ 130              		.loc 1 223 0
+ 131 0094 0DC0A0E1 		mov	ip, sp
+ 132              	.LCFI2:
+ 133              		.cfi_def_cfa_register 12
+ 134              		.loc 1 234 0
+ 135 0098 0420A0E3 		mov	r2, #4
+ 223:board/peripherals/pio/pio_it.c **** {
+ 136              		.loc 1 223 0
+ 137 009c 00D82DE9 		stmfd	sp!, {fp, ip, lr, pc}
+ 138              		.loc 1 234 0
+ 139 00a0 EF2303E5 		str	r2, [r3, #-1007]
+ 140              		.cfi_offset 11, -16
+ 141              		.cfi_offset 13, -12
+ 142              		.cfi_offset 14, -8
+ 223:board/peripherals/pio/pio_it.c **** {
+ 143              		.loc 1 223 0
+ 144 00a4 04B04CE2 		sub	fp, ip, #4
+ 145              	.LCFI3:
+ 146              		.cfi_def_cfa 11, 4
+ 235:board/peripherals/pio/pio_it.c ****     AT91C_BASE_PIOA->PIO_ISR;
+ 147              		.loc 1 235 0
+ 148 00a8 B3CB13E5 		ldr	ip, [r3, #-2995]
+ 229:board/peripherals/pio/pio_it.c ****     numSources = 0;
+ 149              		.loc 1 229 0
+ 150 00ac 2CC09FE5 		ldr	ip, .L14
+ 151 00b0 00E0A0E3 		mov	lr, #0
+ 223:board/peripherals/pio/pio_it.c **** {
+ 152              		.loc 1 223 0
+ 153 00b4 0010A0E1 		mov	r1, r0
+ 229:board/peripherals/pio/pio_it.c ****     numSources = 0;
+ 154              		.loc 1 229 0
+ 155 00b8 38E08CE5 		str	lr, [ip, #56]
+ 236:board/peripherals/pio/pio_it.c ****     AT91C_BASE_PIOA->PIO_IDR = 0xFFFFFFFF;
+ 237:board/peripherals/pio/pio_it.c ****     AIC_ConfigureIT(AT91C_ID_PIOA, priority, InterruptHandler);
+ 156              		.loc 1 237 0
+ 157 00bc 0200A0E3 		mov	r0, #2
+ 158              	.LVL8:
+ 159 00c0 1C209FE5 		ldr	r2, .L14+4
+ 236:board/peripherals/pio/pio_it.c ****     AT91C_BASE_PIOA->PIO_IDR = 0xFFFFFFFF;
+ 160              		.loc 1 236 0
+ 161 00c4 BB3B03E5 		str	r3, [r3, #-3003]
+ 162              		.loc 1 237 0
+ 163 00c8 FEFFFFEB 		bl	AIC_ConfigureIT
+ 164              	.LVL9:
+ 238:board/peripherals/pio/pio_it.c ****     AIC_EnableIT(AT91C_ID_PIOA);
+ 165              		.loc 1 238 0
+ 166 00cc 0200A0E3 		mov	r0, #2
+ 167 00d0 FEFFFFEB 		bl	AIC_EnableIT
+ 168              	.LVL10:
+ 239:board/peripherals/pio/pio_it.c **** #endif
+ 240:board/peripherals/pio/pio_it.c **** 
+ 241:board/peripherals/pio/pio_it.c **** #ifdef AT91C_ID_PIOB
+ 242:board/peripherals/pio/pio_it.c ****     //TRACE_DEBUG("PIO_Initialize: Configuring PIOB\n\r");
+ 243:board/peripherals/pio/pio_it.c ****     AT91C_BASE_PMC->PMC_PCER = 1 << AT91C_ID_PIOB;
+ 244:board/peripherals/pio/pio_it.c ****     AT91C_BASE_PIOB->PIO_ISR;
+ 245:board/peripherals/pio/pio_it.c ****     AT91C_BASE_PIOB->PIO_IDR = 0xFFFFFFFF;
+ 246:board/peripherals/pio/pio_it.c ****     AIC_ConfigureIT(AT91C_ID_PIOB, priority, InterruptHandler);
+ 247:board/peripherals/pio/pio_it.c ****     AIC_EnableIT(AT91C_ID_PIOB);
+ 248:board/peripherals/pio/pio_it.c **** #endif
+ 249:board/peripherals/pio/pio_it.c **** 
+ 250:board/peripherals/pio/pio_it.c **** #ifdef AT91C_ID_PIOC
+ 251:board/peripherals/pio/pio_it.c ****     //TRACE_DEBUG("PIO_Initialize: Configuring PIOC\n\r");
+ 252:board/peripherals/pio/pio_it.c ****     AT91C_BASE_PMC->PMC_PCER = 1 << AT91C_ID_PIOC;
+ 253:board/peripherals/pio/pio_it.c ****     AT91C_BASE_PIOC->PIO_ISR;
+ 254:board/peripherals/pio/pio_it.c ****     AT91C_BASE_PIOC->PIO_IDR = 0xFFFFFFFF;
+ 255:board/peripherals/pio/pio_it.c ****     AIC_ConfigureIT(AT91C_ID_PIOC, priority, InterruptHandler);
+ 256:board/peripherals/pio/pio_it.c ****     AIC_EnableIT(AT91C_ID_PIOC);
+ 257:board/peripherals/pio/pio_it.c **** #endif
+ 258:board/peripherals/pio/pio_it.c **** 
+ 259:board/peripherals/pio/pio_it.c **** #ifdef AT91C_ID_PIOD
+ 260:board/peripherals/pio/pio_it.c ****     //TRACE_DEBUG("PIO_Initialize: Configuring PIOD\n\r");
+ 261:board/peripherals/pio/pio_it.c ****     AT91C_BASE_PMC->PMC_PCER = 1 << AT91C_ID_PIOD;
+ 262:board/peripherals/pio/pio_it.c ****     AT91C_BASE_PIOC->PIO_ISR;
+ 263:board/peripherals/pio/pio_it.c ****     AT91C_BASE_PIOC->PIO_IDR = 0xFFFFFFFF;
+ 264:board/peripherals/pio/pio_it.c ****     AIC_ConfigureIT(AT91C_ID_PIOD, priority, InterruptHandler);
+ 265:board/peripherals/pio/pio_it.c ****     AIC_EnableIT(AT91C_ID_PIOD);
+ 266:board/peripherals/pio/pio_it.c **** #endif
+ 267:board/peripherals/pio/pio_it.c **** 
+ 268:board/peripherals/pio/pio_it.c **** #ifdef AT91C_ID_PIOE
+ 269:board/peripherals/pio/pio_it.c ****     //TRACE_DEBUG("PIO_Initialize: Configuring PIOE\n\r");
+ 270:board/peripherals/pio/pio_it.c ****     AT91C_BASE_PMC->PMC_PCER = 1 << AT91C_ID_PIOE;
+ 271:board/peripherals/pio/pio_it.c ****     AT91C_BASE_PIOC->PIO_ISR;
+ 272:board/peripherals/pio/pio_it.c ****     AT91C_BASE_PIOC->PIO_IDR = 0xFFFFFFFF;
+ 273:board/peripherals/pio/pio_it.c ****     AIC_ConfigureIT(AT91C_ID_PIOE, priority, InterruptHandler);
+ 274:board/peripherals/pio/pio_it.c ****     AIC_EnableIT(AT91C_ID_PIOE);
+ 275:board/peripherals/pio/pio_it.c **** #endif
+ 276:board/peripherals/pio/pio_it.c **** 
+ 277:board/peripherals/pio/pio_it.c **** #if defined(AT91C_ID_PIOABCD)
+ 278:board/peripherals/pio/pio_it.c ****     // Treat PIOABCD interrupts
+ 279:board/peripherals/pio/pio_it.c ****     #if !defined(AT91C_ID_PIOA) \
+ 280:board/peripherals/pio/pio_it.c ****      && !defined(AT91C_ID_PIOB) \
+ 281:board/peripherals/pio/pio_it.c ****      && !defined(AT91C_ID_PIOC) \
+ 282:board/peripherals/pio/pio_it.c ****      && !defined(AT91C_ID_PIOD)
+ 283:board/peripherals/pio/pio_it.c **** 
+ 284:board/peripherals/pio/pio_it.c ****         //TRACE_DEBUG("PIO_Initialize: Configuring PIOABCD\n\r");
+ 285:board/peripherals/pio/pio_it.c ****         AT91C_BASE_PMC->PMC_PCER = 1 << AT91C_ID_PIOABCD;
+ 286:board/peripherals/pio/pio_it.c ****         AT91C_BASE_PIOA->PIO_ISR;
+ 287:board/peripherals/pio/pio_it.c ****         AT91C_BASE_PIOA->PIO_IDR = 0xFFFFFFFF;
+ 288:board/peripherals/pio/pio_it.c ****         AIC_ConfigureIT(AT91C_ID_PIOABCD, priority, InterruptHandler);
+ 289:board/peripherals/pio/pio_it.c ****         AIC_EnableIT(AT91C_ID_PIOABCD);
+ 290:board/peripherals/pio/pio_it.c ****     #endif
+ 291:board/peripherals/pio/pio_it.c **** #endif
+ 292:board/peripherals/pio/pio_it.c **** 
+ 293:board/peripherals/pio/pio_it.c **** #if defined(AT91C_ID_PIOABCDE)
+ 294:board/peripherals/pio/pio_it.c ****     // Treat PIOABCDE interrupts
+ 295:board/peripherals/pio/pio_it.c ****     #if !defined(AT91C_ID_PIOA) \
+ 296:board/peripherals/pio/pio_it.c ****      && !defined(AT91C_ID_PIOB) \
+ 297:board/peripherals/pio/pio_it.c ****      && !defined(AT91C_ID_PIOC) \
+ 298:board/peripherals/pio/pio_it.c ****      && !defined(AT91C_ID_PIOD) \
+ 299:board/peripherals/pio/pio_it.c ****      && !defined(AT91C_ID_PIOE)
+ 300:board/peripherals/pio/pio_it.c **** 
+ 301:board/peripherals/pio/pio_it.c ****         //TRACE_DEBUG("PIO_Initialize: Configuring PIOABCDE\n\r");
+ 302:board/peripherals/pio/pio_it.c ****         AT91C_BASE_PMC->PMC_PCER = 1 << AT91C_ID_PIOABCDE;
+ 303:board/peripherals/pio/pio_it.c ****         AT91C_BASE_PIOA->PIO_ISR;
+ 304:board/peripherals/pio/pio_it.c ****         AT91C_BASE_PIOA->PIO_IDR = 0xFFFFFFFF;
+ 305:board/peripherals/pio/pio_it.c ****         AIC_ConfigureIT(AT91C_ID_PIOABCDE, priority, InterruptHandler);
+ 306:board/peripherals/pio/pio_it.c ****         AIC_EnableIT(AT91C_ID_PIOABCDE);
+ 307:board/peripherals/pio/pio_it.c ****     #endif
+ 308:board/peripherals/pio/pio_it.c **** #endif
+ 309:board/peripherals/pio/pio_it.c **** 
+ 310:board/peripherals/pio/pio_it.c **** #if defined(AT91C_ID_PIOCDE)
+ 311:board/peripherals/pio/pio_it.c ****     // Treat PIOCDE interrupts
+ 312:board/peripherals/pio/pio_it.c ****     #if !defined(AT91C_ID_PIOC) \
+ 313:board/peripherals/pio/pio_it.c ****      && !defined(AT91C_ID_PIOD) \
+ 314:board/peripherals/pio/pio_it.c ****      && !defined(AT91C_ID_PIOE)
+ 315:board/peripherals/pio/pio_it.c **** 
+ 316:board/peripherals/pio/pio_it.c ****         //TRACE_DEBUG("PIO_Initialize: Configuring PIOC\n\r");
+ 317:board/peripherals/pio/pio_it.c ****         AT91C_BASE_PMC->PMC_PCER = 1 << AT91C_ID_PIOCDE;
+ 318:board/peripherals/pio/pio_it.c ****         AT91C_BASE_PIOC->PIO_ISR;
+ 319:board/peripherals/pio/pio_it.c ****         AT91C_BASE_PIOC->PIO_IDR = 0xFFFFFFFF;
+ 320:board/peripherals/pio/pio_it.c ****         AIC_ConfigureIT(AT91C_ID_PIOCDE, priority, InterruptHandler);
+ 321:board/peripherals/pio/pio_it.c ****         AIC_EnableIT(AT91C_ID_PIOCDE);
+ 322:board/peripherals/pio/pio_it.c ****     #endif
+ 323:board/peripherals/pio/pio_it.c **** #endif
+ 324:board/peripherals/pio/pio_it.c **** }
+ 169              		.loc 1 324 0
+ 170 00d4 0CD04BE2 		sub	sp, fp, #12
+ 171 00d8 00689DE8 		ldmfd	sp, {fp, sp, lr}
+ 172 00dc 1EFF2FE1 		bx	lr
+ 173              	.L15:
+ 174              		.align	2
+ 175              	.L14:
+ 176 00e0 00000000 		.word	.LANCHOR0
+ 177 00e4 00000000 		.word	InterruptHandler
+ 178              		.cfi_endproc
+ 179              	.LFE285:
+ 181              		.align	2
+ 182              		.global	PIO_ConfigureIt
+ 184              	PIO_ConfigureIt:
+ 185              	.LFB286:
+ 325:board/peripherals/pio/pio_it.c **** 
+ 326:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+ 327:board/peripherals/pio/pio_it.c **** /// Configures a PIO or a group of PIO to generate an interrupt on status
+ 328:board/peripherals/pio/pio_it.c **** /// change. The provided interrupt handler will be called with the triggering
+ 329:board/peripherals/pio/pio_it.c **** /// pin as its parameter (enabling different pin instances to share the same
+ 330:board/peripherals/pio/pio_it.c **** /// handler).
+ 331:board/peripherals/pio/pio_it.c **** /// \param pPin  Pointer to a Pin instance.
+ 332:board/peripherals/pio/pio_it.c **** /// \param handler  Interrupt handler function pointer.
+ 333:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+ 334:board/peripherals/pio/pio_it.c **** void PIO_ConfigureIt(const Pin *pPin, void (*handler)(const Pin *))
+ 335:board/peripherals/pio/pio_it.c **** {
+ 186              		.loc 1 335 0
+ 187              		.cfi_startproc
+ 188              		@ Function supports interworking.
+ 189              		@ args = 0, pretend = 0, frame = 0
+ 190              		@ frame_needed = 0, uses_anonymous_args = 0
+ 191              		@ link register save eliminated.
+ 192              	.LVL11:
+ 336:board/peripherals/pio/pio_it.c ****     InterruptSource *pSource;
+ 337:board/peripherals/pio/pio_it.c **** 
+ 338:board/peripherals/pio/pio_it.c ****     //TRACE_DEBUG("PIO_ConfigureIt()\n\r");
+ 339:board/peripherals/pio/pio_it.c **** 
+ 340:board/peripherals/pio/pio_it.c ****     //SANITY_CHECK(pPin);
+ 341:board/peripherals/pio/pio_it.c **** 
+ 342:board/peripherals/pio/pio_it.c ****     // Define new source
+ 343:board/peripherals/pio/pio_it.c ****     //TRACE_DEBUG("PIO_ConfigureIt: Defining new source #%d.\n\r",  numSources);
+ 344:board/peripherals/pio/pio_it.c **** 
+ 345:board/peripherals/pio/pio_it.c ****     pSource = &(pSources[numSources]);
+ 193              		.loc 1 345 0
+ 194 00e8 20309FE5 		ldr	r3, .L17
+ 195 00ec 382093E5 		ldr	r2, [r3, #56]
+ 335:board/peripherals/pio/pio_it.c **** {
+ 196              		.loc 1 335 0
+ 197 00f0 04402DE5 		str	r4, [sp, #-4]!
+ 198              	.LCFI4:
+ 199              		.cfi_def_cfa_offset 4
+ 200              		.cfi_offset 4, -4
+ 346:board/peripherals/pio/pio_it.c ****     pSource->pPin = pPin;
+ 347:board/peripherals/pio/pio_it.c ****     pSource->handler = handler;
+ 348:board/peripherals/pio/pio_it.c ****     numSources++;
+ 201              		.loc 1 348 0
+ 202 00f4 01C082E2 		add	ip, r2, #1
+ 345:board/peripherals/pio/pio_it.c ****     pSource = &(pSources[numSources]);
+ 203              		.loc 1 345 0
+ 204 00f8 824183E0 		add	r4, r3, r2, asl #3
+ 205              	.LVL12:
+ 346:board/peripherals/pio/pio_it.c ****     pSource->pPin = pPin;
+ 206              		.loc 1 346 0
+ 207 00fc 820183E7 		str	r0, [r3, r2, asl #3]
+ 347:board/peripherals/pio/pio_it.c ****     pSource->handler = handler;
+ 208              		.loc 1 347 0
+ 209 0100 041084E5 		str	r1, [r4, #4]
+ 210              		.loc 1 348 0
+ 211 0104 38C083E5 		str	ip, [r3, #56]
+ 349:board/peripherals/pio/pio_it.c **** }
+ 212              		.loc 1 349 0
+ 213 0108 1000BDE8 		ldmfd	sp!, {r4}
+ 214 010c 1EFF2FE1 		bx	lr
+ 215              	.L18:
+ 216              		.align	2
+ 217              	.L17:
+ 218 0110 00000000 		.word	.LANCHOR0
+ 219              		.cfi_endproc
+ 220              	.LFE286:
+ 222              		.align	2
+ 223              		.global	PIO_EnableIt
+ 225              	PIO_EnableIt:
+ 226              	.LFB287:
+ 350:board/peripherals/pio/pio_it.c **** 
+ 351:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+ 352:board/peripherals/pio/pio_it.c **** /// Enables the given interrupt source if it has been configured. The status
+ 353:board/peripherals/pio/pio_it.c **** /// register of the corresponding PIO controller is cleared prior to enabling
+ 354:board/peripherals/pio/pio_it.c **** /// the interrupt.
+ 355:board/peripherals/pio/pio_it.c **** /// \param pPin  Interrupt source to enable.
+ 356:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+ 357:board/peripherals/pio/pio_it.c **** void PIO_EnableIt(const Pin *pPin)
+ 358:board/peripherals/pio/pio_it.c **** {
+ 227              		.loc 1 358 0
+ 228              		.cfi_startproc
+ 229              		@ Function supports interworking.
+ 230              		@ args = 0, pretend = 0, frame = 0
+ 231              		@ frame_needed = 0, uses_anonymous_args = 0
+ 232              		@ link register save eliminated.
+ 233              	.LVL13:
+ 359:board/peripherals/pio/pio_it.c ****     //TRACE_DEBUG("PIO_EnableIt()\n\r");
+ 360:board/peripherals/pio/pio_it.c **** 
+ 361:board/peripherals/pio/pio_it.c ****     //SANITY_CHECK(pPin);
+ 362:board/peripherals/pio/pio_it.c **** 
+ 363:board/peripherals/pio/pio_it.c ****     pPin->pio->PIO_ISR;
+ 364:board/peripherals/pio/pio_it.c ****     pPin->pio->PIO_IER = pPin->mask;
+ 234              		.loc 1 364 0
+ 235 0114 0C0090E8 		ldmia	r0, {r2, r3}
+ 363:board/peripherals/pio/pio_it.c ****     pPin->pio->PIO_ISR;
+ 236              		.loc 1 363 0
+ 237 0118 4C1093E5 		ldr	r1, [r3, #76]
+ 238              		.loc 1 364 0
+ 239 011c 402083E5 		str	r2, [r3, #64]
+ 240 0120 1EFF2FE1 		bx	lr
+ 241              		.cfi_endproc
+ 242              	.LFE287:
+ 244              		.align	2
+ 245              		.global	PIO_DisableIt
+ 247              	PIO_DisableIt:
+ 248              	.LFB288:
+ 365:board/peripherals/pio/pio_it.c **** }
+ 366:board/peripherals/pio/pio_it.c **** 
+ 367:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+ 368:board/peripherals/pio/pio_it.c **** /// Disables a given interrupt source, with no added side effects.
+ 369:board/peripherals/pio/pio_it.c **** /// \param pPin  Interrupt source to disable.
+ 370:board/peripherals/pio/pio_it.c **** //------------------------------------------------------------------------------
+ 371:board/peripherals/pio/pio_it.c **** void PIO_DisableIt(const Pin *pPin)
+ 372:board/peripherals/pio/pio_it.c **** {
+ 249              		.loc 1 372 0
+ 250              		.cfi_startproc
+ 251              		@ Function supports interworking.
+ 252              		@ args = 0, pretend = 0, frame = 0
+ 253              		@ frame_needed = 0, uses_anonymous_args = 0
+ 254              		@ link register save eliminated.
+ 255              	.LVL14:
+ 373:board/peripherals/pio/pio_it.c ****     //SANITY_CHECK(pPin);
+ 374:board/peripherals/pio/pio_it.c **** 
+ 375:board/peripherals/pio/pio_it.c ****     //TRACE_DEBUG("PIO_DisableIt()\n\r");
+ 376:board/peripherals/pio/pio_it.c **** 
+ 377:board/peripherals/pio/pio_it.c ****     pPin->pio->PIO_IDR = pPin->mask;
+ 256              		.loc 1 377 0
+ 257 0124 0C0090E8 		ldmia	r0, {r2, r3}
+ 258 0128 442083E5 		str	r2, [r3, #68]
+ 259 012c 1EFF2FE1 		bx	lr
+ 260              		.cfi_endproc
+ 261              	.LFE288:
+ 263              		.bss
+ 264              		.align	2
+ 265              		.set	.LANCHOR0,. + 0
+ 268              	pSources:
+ 269 0000 00000000 		.space	56
+ 269      00000000 
+ 269      00000000 
+ 269      00000000 
+ 269      00000000 
+ 272              	numSources:
+ 273 0038 00000000 		.space	4
+ 274              		.text
+ 275              	.Letext0:
+ 276              		.file 2 "board/AT91SAM7S256.h"
+ 277              		.file 3 "board/peripherals/pio/pio.h"
+ 278              		.file 4 "board/peripherals/aic/aic.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 pio_it.c
+     /tmp/ccw70QTz.s:16     .text:0000000000000000 $a
+     /tmp/ccw70QTz.s:18     .text:0000000000000000 InterruptHandler
+     /tmp/ccw70QTz.s:113    .text:000000000000008c $d
+     /tmp/ccw70QTz.s:117    .text:0000000000000090 $a
+     /tmp/ccw70QTz.s:120    .text:0000000000000090 PIO_InitializeInterrupts
+     /tmp/ccw70QTz.s:176    .text:00000000000000e0 $d
+     /tmp/ccw70QTz.s:181    .text:00000000000000e8 $a
+     /tmp/ccw70QTz.s:184    .text:00000000000000e8 PIO_ConfigureIt
+     /tmp/ccw70QTz.s:218    .text:0000000000000110 $d
+     /tmp/ccw70QTz.s:222    .text:0000000000000114 $a
+     /tmp/ccw70QTz.s:225    .text:0000000000000114 PIO_EnableIt
+     /tmp/ccw70QTz.s:247    .text:0000000000000124 PIO_DisableIt
+     /tmp/ccw70QTz.s:264    .bss:0000000000000000 $d
+     /tmp/ccw70QTz.s:268    .bss:0000000000000000 pSources
+     /tmp/ccw70QTz.s:272    .bss:0000000000000038 numSources
+                     .debug_frame:0000000000000010 $d
+
+UNDEFINED SYMBOLS
+AIC_ConfigureIT
+AIC_EnableIT
