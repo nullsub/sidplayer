@@ -52,6 +52,7 @@ TARGET = alarm
 
 ## MAIN:
 SRC += main.c
+SRC += data.c
 SRC += sid.c
 SRC += uart.c
 SRC += board/Cstartup_SAM7.c

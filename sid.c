@@ -195,6 +195,19 @@ void sid_clear(void)
 	return;
 }
 
+void play_song()
+{
+	int ptr = 0;
+	while(song[ptr] != 99) {
+		int length = song[ptr++];
+		for(int i = 0; i < length; i++) {
+			sid_write(song[ptr], song[ptr+1]);
+			ptr += 2;
+		}
+		delay_ms(19);
+	}
+}
+
 void sid_init()
 {
 	LED_Configure(1);

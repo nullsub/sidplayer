@@ -25,9 +25,11 @@ int main(void) {
 		delay_ms(1000);
 	sid_init();
 
-	while(1){
 		delay_ms(3000);
 		sid_michael();
+	while(1){
+		delay_ms(3000);
+		play_song();
 	}
 }
 
