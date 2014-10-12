@@ -1,39 +1,35 @@
 #include "sid.h"
 #include "board.h"
 #include "pio/pio.h"
-#include "pit/pit.h"
-#include "led.h"
 
-static const Pin SID_D_OUT_PIN_7   = {1 << 0, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
-static const Pin SID_D_OUT_PIN_6   = {1 << 2, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
-static const Pin SID_D_OUT_PIN_5   = {1 << 30, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
-static const Pin SID_D_OUT_PIN_4   = {1 << 28, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
-static const Pin SID_D_OUT_PIN_3   = {1 << 4, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
+static const Pin SID_D_OUT_PIN_7	= {1 << 0, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
+static const Pin SID_D_OUT_PIN_6	= {1 << 2, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
+static const Pin SID_D_OUT_PIN_5	= {1 << 30, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
+static const Pin SID_D_OUT_PIN_4	= {1 << 28, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
+static const Pin SID_D_OUT_PIN_3	= {1 << 4, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
 static const Pin SID_D_OUT_PIN_2	= {1 << 6, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
 static const Pin SID_D_OUT_PIN_1	= {1 << 8, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
 static const Pin SID_D_OUT_PIN_0	= {1 << 10, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
-static const Pin SID_D_IN_PIN_0   = {1 << 0, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_DEFAULT};
-static const Pin SID_D_IN_PIN_1   = {1 << 2, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_DEFAULT};
-static const Pin SID_D_IN_PIN_2   = {1 << 30, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_DEFAULT};
-static const Pin SID_D_IN_PIN_3   = {1 << 28, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_DEFAULT};
-static const Pin SID_D_IN_PIN_4   = {1 << 4, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_DEFAULT};
-static const Pin SID_D_IN_PIN_5	= {1 << 6, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_DEFAULT};
-static const Pin SID_D_IN_PIN_6	= {1 << 8, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_DEFAULT};
-static const Pin SID_D_IN_PIN_7	= {1 << 10, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_DEFAULT};
-static const Pin SID_APIN_4   = {1 << 12, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
-static const Pin SID_APIN_3   = {1 << 25, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
-static const Pin SID_APIN_2   = {1 << 13, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
-static const Pin SID_APIN_1   = {1 << 15, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
-static const Pin SID_APIN_0   = {1 << 20, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
-static const Pin SID_CS_PIN	= {1 << 22, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
-static const Pin SID_RW_PIN	= {1 << 21, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
-static const Pin SID_RESET_PIN   = {1 << 17, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
+static const Pin SID_D_IN_PIN_0		= {1 << 0, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_DEFAULT};
+static const Pin SID_D_IN_PIN_1		= {1 << 2, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_DEFAULT};
+static const Pin SID_D_IN_PIN_2		= {1 << 30, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_DEFAULT};
+static const Pin SID_D_IN_PIN_3		= {1 << 28, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_DEFAULT};
+static const Pin SID_D_IN_PIN_4		= {1 << 4, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_DEFAULT};
+static const Pin SID_D_IN_PIN_5		= {1 << 6, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_DEFAULT};
+static const Pin SID_D_IN_PIN_6		= {1 << 8, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_DEFAULT};
+static const Pin SID_D_IN_PIN_7		= {1 << 10, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_DEFAULT};
+static const Pin SID_APIN_4		= {1 << 12, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
+static const Pin SID_APIN_3		= {1 << 25, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
+static const Pin SID_APIN_2		= {1 << 13, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
+static const Pin SID_APIN_1		= {1 << 15, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
+static const Pin SID_APIN_0		= {1 << 20, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
+static const Pin SID_CS_PIN		= {1 << 22, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
+static const Pin SID_RW_PIN		= {1 << 21, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
+static const Pin SID_RESET_PIN		= {1 << 17, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
 
 static const Pin SID_READ_CLK   = {1 << 9, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_DEFAULT};
 static const Pin SID_CLK_PIN = {1 << 11, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT};
 //#define SID_CLK_PIN	AT91C_PA11_PWM0
-
-//#define SID_PINS    SID_PIN_0, SID_PIN_1, SID_PIN_2, SID_PIN_3, SID_PIN_4, SID_PIN_5, SID_PIN_6, SID_PIN_7, SID_PIN_8, SID_PIN_9, SID_PIN_10, SID_PIN_11,  SID_PIN_12, SID_PIN_13
 
 /*    PWM Clock source Domain */
 #define         MCKtoPWM      0
@@ -173,8 +169,7 @@ void sid_write(unsigned char sid_register, unsigned char sid_data)
 	asm("nop");
 	asm("nop");
 	sid_clr_cs();
-//	sid_wait_for_high();
-	//PORTA = sid_data;
+	//	sid_wait_for_high();
 	asm("nop");
 	asm("nop");
 	asm("nop");
@@ -183,16 +178,14 @@ void sid_write(unsigned char sid_register, unsigned char sid_data)
 	asm("nop");
 	asm("nop");
 	asm("nop");
-//	sid_wait_for_low();
+	//	sid_wait_for_low();
 	sid_set_cs();
 	return;
 }
 
 void sid_clear(void)
 {
-	unsigned char i;
-	for(i = 0; i < 27; i++) sid_write(i, 0);
-	return;
+	for(int i = 0; i < 27; i++) sid_write(i, 0);
 }
 
 void play_song()
@@ -206,12 +199,11 @@ void play_song()
 		}
 		delay_ms(19);
 	}
+	sid_clear();
 }
 
 void sid_init()
 {
-	LED_Configure(1);
-	LED_Set(1);
 	PIO_Configure(&SID_APIN_0, 1);
 	PIO_Configure(&SID_APIN_1, 1);
 	PIO_Configure(&SID_APIN_2, 1);
@@ -257,53 +249,4 @@ void sid_init()
 	sid_set_cs();
 	sid_reset();
 	sid_clear();
-	//sid_reset();
-/*
-	sid_write(24, 0x0f);
-	sid_write(1, 0x06);
-	sid_write(5, 12);
-	sid_write(6,4);
-	sid_write(4,33);
-*/
-}
-
-void sid_michael(void) {
-	int i;
-
-	short data[42] = { 17, 103, 250, 21, 237, 250, 26, 20,
-		400, 21, 237, 100, 26, 20, 250, 29,
-		69, 250, 26, 20, 250, 0, 0, 250, 21,
-		237, 250, 26, 20, 250, 29, 69, 1000,
-		26, 20, 250, 0, 0, 250, -1, -1, 0 };
-
-	unsigned char fl = 0;
-	unsigned char fh = 1;
-	unsigned char tl = 2;
-	unsigned char th = 3;
-	unsigned char w = 4;
-	unsigned char a = 5;
-	unsigned char h = 6;
-	unsigned char l = 24;
-
-	sid_write(l, 15);
-	sid_write(th, 13);
-	sid_write(tl, 15);
-	sid_write(a, 3*16+15);
-	sid_write(h, 9);
-
-	short x, y;
-	int d;
-	short z;
-
-	for(i = 0; i <= 42; i+=3) {
-		x = data[i];
-		y = data[i+1];
-		d = data[i+2];
-		if(x == -1) return;
-		sid_write(fh, (unsigned char)x);
-		sid_write(fl, (unsigned char)y);
-		sid_write(w, 65);
-		for(z = 0; z < d; z++) delay_us(700);
-			sid_write(w, 0);
-	}
 }

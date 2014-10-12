@@ -13,6 +13,7 @@ AT91S_USART * pUSART = AT91C_BASE_US0;      /* Global Pointer to USART0 */
 #define IRQ_MASK 0x00000080
 #define FIQ_MASK 0x00000040
 #define INT_MASK (IRQ_MASK | FIQ_MASK)
+
 struct FIFO{
 	char bffr[BUFFER_LENGTH]; // holds characters
 	int nChars; // counts number of received chars
@@ -23,52 +24,52 @@ struct FIFO{
 
 void Usart0IrqHandler (void) {
 
-        volatile AT91PS_USART pUsart0 = AT91C_BASE_US0; // create a pointer to USART0 structure
-        // determine which interrupt has occurred
-        // assume half-duplex operation here, only one interrupt type at a time
-        if ((pUsart0->US_CSR & AT91C_US_RXRDY) == AT91C_US_RXRDY) {
-				if (rx.nChars < BUFFER_LENGTH){
-					// we have a receive interrupt,
-					// remove it from Receiver Holding Register and place into buffer[]
-					*rx.wr_bffr++ = pUsart0->US_RHR;
-					rx.nChars++;
-					// check if 10 characters have been received
-					if(rx.wr_bffr > &rx.bffr[BUFFER_LENGTH]){
-						rx.wr_bffr = &rx.bffr[0];
-					}
-                }
-				else{
-					//USART_puts("recieve Buffer is Full\n\r");
-					//clear interupt anyway!
-					pUsart0->US_RHR;
-				}
+	volatile AT91PS_USART pUsart0 = AT91C_BASE_US0; // create a pointer to USART0 structure
+	// determine which interrupt has occurred
+	// assume half-duplex operation here, only one interrupt type at a time
+	if ((pUsart0->US_CSR & AT91C_US_RXRDY) == AT91C_US_RXRDY) {
+		if (rx.nChars < BUFFER_LENGTH){
+			// we have a receive interrupt,
+			// remove it from Receiver Holding Register and place into buffer[]
+			*rx.wr_bffr++ = pUsart0->US_RHR;
+			rx.nChars++;
+			// check if 10 characters have been received
+			if(rx.wr_bffr > &rx.bffr[BUFFER_LENGTH]){
+				rx.wr_bffr = &rx.bffr[0];
+			}
+		}
+		else{
+			//USART_puts("recieve Buffer is Full\n\r");
+			//clear interupt anyway!
+			pUsart0->US_RHR;
+		}
 
-        }
-       /* else if ((pUsart0->US_CSR & AT91C_US_TXEMPTY) == AT91C_US_TXEMPTY) {
-		//USART_puts("transmit interupt\r");
-// we have a transmit interrupt (previous char has clocked out)
-// check if 10 characters have been transmitted
-                if (nChars >= BUFFER_LENGTH) {
-// yes, redirect buffer pointer to beginning
-                        pBuffer = &Buffer[0];
-                        nChars = 0;
-// enable receive interrupt, disable the transmit interrupt
-                        pUsart0->US_IER = AT91C_US_RXRDY; // enable RXRDY usart0 receive interrupt
-                        pUsart0->US_IDR = ~AT91C_US_RXRDY; // disable all interrupts except RXRDY
-                }
-                else {
-// no, send next character
-                        pUsart0->US_THR = *pBuffer++;
-                        nChars++;
-                }
-        }*/
+	}
+	/* else if ((pUsart0->US_CSR & AT91C_US_TXEMPTY) == AT91C_US_TXEMPTY) {
+	//USART_puts("transmit interupt\r");
+	// we have a transmit interrupt (previous char has clocked out)
+	// check if 10 characters have been transmitted
+	if (nChars >= BUFFER_LENGTH) {
+	// yes, redirect buffer pointer to beginning
+	pBuffer = &Buffer[0];
+	nChars = 0;
+	// enable receive interrupt, disable the transmit interrupt
+	pUsart0->US_IER = AT91C_US_RXRDY; // enable RXRDY usart0 receive interrupt
+	pUsart0->US_IDR = ~AT91C_US_RXRDY; // disable all interrupts except RXRDY
+	}
+	else {
+	// no, send next character
+	pUsart0->US_THR = *pBuffer++;
+	nChars++;
+	}
+	}*/
 }
 // *******************************************************
 // Function Prototypes
 // *******************************************************
 //void Usart0IrqHandler(void);
 void USART0Setup(void) {
-// enable the usart0 peripheral clock
+	// enable the usart0 peripheral clock
 	volatile AT91PS_PMC pPMC = AT91C_BASE_PMC; // pointer to PMC data structure
 	pPMC->PMC_PCER = (1<<AT91C_ID_US0); // enable usart0 peripheral clock
 	// set up PIO to enable USART0 peripheral control of pins
@@ -79,11 +80,11 @@ void USART0Setup(void) {
 	// set up the USART0 registers
 	volatile AT91PS_USART pUSART0 = AT91C_BASE_US0; // create a pointer to USART0 structure
 	pUSART0->US_CR = AT91C_US_RSTRX | // reset receiver
-	AT91C_US_RSTTX | // reset transmitter
-	AT91C_US_RXDIS | // disable receiver
-	AT91C_US_TXDIS; // disable transmitter
+		AT91C_US_RSTTX | // reset transmitter
+		AT91C_US_RXDIS | // disable receiver
+		AT91C_US_TXDIS; // disable transmitter
 	pUSART0->US_MR = AT91C_US_PAR_NONE | // no parity
-	                 0x3 << 6; // 8-bit characters
+		0x3 << 6; // 8-bit characters
 	//
 	pUSART0->US_IER = 0x00; // no usart0 interrupts enabled (no effect)
 	//
@@ -96,9 +97,9 @@ void USART0Setup(void) {
 	volatile AT91PS_AIC pAIC = AT91C_BASE_AIC; // pointer to AIC data structure
 	pAIC->AIC_IDCR = (1<<AT91C_ID_US0); // Disable USART0 interrupt in AIC
 	pAIC->AIC_SVR[AT91C_ID_US0] = // Set the USART0 IRQ handler address in AIC Source
-	(unsigned int)Usart0IrqHandler; // Vector Register[6]
+		(unsigned int)Usart0IrqHandler; // Vector Register[6]
 	pAIC->AIC_SMR[AT91C_ID_US0] = // Set the interrupt source type(level-sensitive) and
-	(/*AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL*/AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL  | 0x4 ); // priority (4) in AIC Source Mode Register[6] // AIC_SMR7 = 0xFFFFF01C
+		(/*AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL*/AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL  | 0x4 ); // priority (4) in AIC Source Mode Register[6] // AIC_SMR7 = 0xFFFFF01C
 	pAIC->AIC_IECR = (1<<AT91C_ID_US0); // Enable the USART0 interrupt in AIC
 	//enable the USART0 receiver and transmitter
 	pUSART0->US_CR = AT91C_US_RXEN | AT91C_US_TXEN;
@@ -155,68 +156,68 @@ void USART_puts(char *s)
 
 static inline unsigned __get_cpsr(void)
 {
-  unsigned long retval;
-  asm volatile (" mrs  %0, cpsr" : "=r" (retval) :   );
-  return retval;
+	unsigned long retval;
+	asm volatile (" mrs  %0, cpsr" : "=r" (retval) :   );
+	return retval;
 }
 
 static inline void __set_cpsr(unsigned val)
 {
-  asm volatile (" msr  cpsr, %0" :  : "r" (val)  );
+	asm volatile (" msr  cpsr, %0" :  : "r" (val)  );
 }
 
 unsigned disableIRQ(void)
 {
-  unsigned _cpsr;
+	unsigned _cpsr;
 
-  _cpsr = __get_cpsr();
-  __set_cpsr(_cpsr | IRQ_MASK);
-  return _cpsr;
+	_cpsr = __get_cpsr();
+	__set_cpsr(_cpsr | IRQ_MASK);
+	return _cpsr;
 }
 
 unsigned restoreIRQ(unsigned oldCPSR)
 {
-  unsigned _cpsr;
+	unsigned _cpsr;
 
-  _cpsr = __get_cpsr();
-  __set_cpsr((_cpsr & ~IRQ_MASK) | (oldCPSR & IRQ_MASK));
-  return _cpsr;
+	_cpsr = __get_cpsr();
+	__set_cpsr((_cpsr & ~IRQ_MASK) | (oldCPSR & IRQ_MASK));
+	return _cpsr;
 }
 
 unsigned enableIRQ(void)
 {
-  unsigned _cpsr;
+	unsigned _cpsr;
 
-  _cpsr = __get_cpsr();
-  __set_cpsr(_cpsr & ~IRQ_MASK);
-  return _cpsr;
+	_cpsr = __get_cpsr();
+	__set_cpsr(_cpsr & ~IRQ_MASK);
+	return _cpsr;
 }
 
 unsigned disableFIQ(void)
 {
-  unsigned _cpsr;
+	unsigned _cpsr;
 
-  _cpsr = __get_cpsr();
-  __set_cpsr(_cpsr | FIQ_MASK);
-  return _cpsr;
+	_cpsr = __get_cpsr();
+	__set_cpsr(_cpsr | FIQ_MASK);
+	return _cpsr;
 }
 
 unsigned restoreFIQ(unsigned oldCPSR)
 {
-  unsigned _cpsr;
+	unsigned _cpsr;
 
-  _cpsr = __get_cpsr();
-  __set_cpsr((_cpsr & ~FIQ_MASK) | (oldCPSR & FIQ_MASK));
-  return _cpsr;
+	_cpsr = __get_cpsr();
+	__set_cpsr((_cpsr & ~FIQ_MASK) | (oldCPSR & FIQ_MASK));
+	return _cpsr;
 }
 
 unsigned enableFIQ(void)
 {
-  unsigned _cpsr;
+	unsigned _cpsr;
 
-  _cpsr = __get_cpsr();
-  __set_cpsr(_cpsr & ~FIQ_MASK);
-  return _cpsr;
+	_cpsr = __get_cpsr();
+	__set_cpsr(_cpsr & ~FIQ_MASK);
+	return _cpsr;
 }
 
 

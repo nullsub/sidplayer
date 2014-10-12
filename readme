@@ -1,2 +1,2 @@
-This is a alarm clock. It wakes you with a mp3 song from a sdcard.
+interfaces an sid 6581 chip. to be used with my ttl-cpu
 The at91sam7s-ek board is used.
